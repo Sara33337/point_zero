@@ -1,8 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
+import 'package:point_zero/features/pos/domain/entities/bill_entity.dart';
 import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
 import 'package:point_zero/features/pos/domain/useCases/process_exchange_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/search_past_sale_useCase.dart';
+import 'package:point_zero/features/pos/domain/useCases/search_products_useCase.dart';
 // ⚠️ تأكدي من مسار الـ UseCase بتاعة البحث في المنتجات العادية عندك
 // import 'package:point_zero/features/products/domain/useCases/search_products_usecase.dart';
 
@@ -11,21 +14,20 @@ import 'exchange_state.dart';
 class ExchangeCubit extends Cubit<ExchangeState> {
   final SearchPastSalesUseCase searchPastSalesUseCase;
   final ProcessExchangeUseCase processExchangeUseCase;
+  final SearchProductsUsecase searchProductsUsecase;
 
   ExchangeCubit({
     required this.searchPastSalesUseCase,
     required this.processExchangeUseCase,
+    required this.searchProductsUsecase
     // required this.searchProductsUseCase,
   }) : super(const ExchangeState());
 
-
+  // serach for returned items
   Future<void> searchPastBills(String query) async {
     if (query.isEmpty) return;
-
     emit(state.copyWith(isSearching: true, errorMessage: null));
-
     final result = await searchPastSalesUseCase(query);
-
     result.fold(
       (failure) {
         emit(
@@ -41,25 +43,92 @@ class ExchangeCubit extends Cubit<ExchangeState> {
       },
     );
   }
-
+  
+  // select returned item
   void selectReturnedItem(PastSaleItemEntity item) {
     emit(
-      state.copyWith(returnedItem: item, returnQuantity: 1, searchResults: []),
+      state.copyWith(returnedItem: item, 
+      billId: item.billId,
+      returnQuantity: 1, searchResults: [],
+      maxReturnQuantity: item.quantity,),
     );
     _calculateTotals();
   }
-
+  
+  // change selected returned item quantity
   void updateReturnQuantity(int qty, int maxQty) {
     if (qty > 0 && qty <= maxQty) {
       emit(state.copyWith(returnQuantity: qty));
       _calculateTotals();
     }
   }
+  
 
-  void setSearchingReplacement(bool isSearching) {
-    emit(state.copyWith(isSearchingReplacement: isSearching));
+  Future<void> searchReplacementProducts(String query) async {
+    if (query.isEmpty) {
+      emit(state.copyWith(isSearchingReplacement: false, replacementSearchResults: []));
+      return;
+    }
+
+    emit(state.copyWith(isSearchingReplacement: true, errorMessage: null));
+
+    final result = await searchProductsUsecase(query);
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isSearchingReplacement: false,
+          replacementSearchResults: [],
+          errorMessage: failure.message,
+        ));
+      },
+      (products) {
+        emit(state.copyWith(
+          isSearchingReplacement: false,
+          replacementSearchResults: products,
+        ));
+      },
+    );
   }
 
+  // 2. دالة إضافة المنتج للسلة البديلة
+  void addReplacementItem(ProductEntity product) {
+    final updatedList = List<CartItemModel>.from(state.replacementItems);
+
+    final existingIndex = updatedList.indexWhere(
+      (element) => element.product.code == product.code,
+    );
+    
+    if (existingIndex >= 0) {
+      // لو المنتج موجود أصلاً في السلة البديلة، بنزود الكمية بتاعته
+      final oldItem = updatedList[existingIndex];
+      updatedList[existingIndex] = CartItemModel(
+        product: oldItem.product,
+        quantity: oldItem.quantity + 1,
+        unitPrice: oldItem.unitPrice,
+      );
+    } else {
+      // لو منتج جديد، بنحوله لـ CartItemModel ونضيفه بكمية 1
+      updatedList.add(
+        CartItemModel(
+          product: product,
+          quantity: 1,
+          unitPrice: product.sellingPrice, // تأكدي إن اسم المتغير sellingPrice أو price حسب الـ Entity بتاعتك
+        )
+      );
+    }
+
+    emit(
+      state.copyWith(
+        replacementItems: updatedList,
+        // تصفير البحث عشان الشاشة ترجع فاضية وجاهزة لبحث جديد
+        replacementSearchResults: [], 
+      ),
+    );
+    _calculateTotals();
+  }
+
+  // 3. دالة حذف المنتج من السلة البديلة
   void removeReplacementItem(CartItemModel item) {
     final updatedList = List<CartItemModel>.from(state.replacementItems);
 
@@ -71,37 +140,7 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     _calculateTotals(); // بنعيد الحسابات عشان الفلوس تتحدث
   }
 
-  // 2. إضافة المنتج للسلة بعد اختياره من نتائج البحث
-  void addReplacementItem(CartItemModel item) {
-    final updatedList = List<CartItemModel>.from(state.replacementItems);
 
-    final existingIndex = updatedList.indexWhere(
-      (element) => element.product.code == item.product.code,
-    );
-    if (existingIndex >= 0) {
-      final oldItem = updatedList[existingIndex];
-      updatedList[existingIndex] = CartItemModel(
-        product: oldItem.product,
-        quantity: oldItem.quantity + 1,
-        unitPrice: oldItem.unitPrice,
-      );
-    } else {
-      updatedList.add(item);
-    }
-
-    emit(
-      state.copyWith(
-        replacementItems: updatedList,
-        isSearchingReplacement:
-            false, // 👈 تصفير لستة البحث عشان الشاشة ترجع تعرض السلة
-      ),
-    );
-    _calculateTotals();
-  }
-
-  // ==========================================
-  // القسم الثالث: الحسابات وتأكيد العملية
-  // ==========================================
 
   void _calculateTotals() {
     double credit = 0.0;
@@ -131,8 +170,12 @@ class ExchangeCubit extends Cubit<ExchangeState> {
 
     emit(state.copyWith(status: ExchangeStatus.loading, errorMessage: null));
 
+    final itemWithCorrectQuantity = state.returnedItem!.copyWith(
+      quantity: state.returnQuantity, 
+    );
+
     final params = ProcessExchangeParams(
-      returnedItem: state.returnedItem!,
+      returnedItem: itemWithCorrectQuantity, // 👈 بنبعت النسخة المتعدلة
       replacementItems: state.replacementItems,
       differencePaid: state.customerPays,
     );

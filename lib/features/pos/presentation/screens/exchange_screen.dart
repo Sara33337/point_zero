@@ -71,7 +71,7 @@ class ExchangeDialogWidget extends StatelessWidget {
                           child: ReturnItemsSection(),
                         ),
                         
-                        SizedBox(width: 32.w), // مسافة بين العمودين
+                        SizedBox(width: 20.w), // مسافة بين العمودين
                         
                         // العمود الثاني: المنتجات البديلة (Step 2)
                         Expanded(

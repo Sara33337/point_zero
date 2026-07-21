@@ -1,12 +1,15 @@
 import 'package:point_zero/core/data/db_helper.dart';
+import 'package:point_zero/features/inventory/data/models/product_model.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
 import 'package:point_zero/features/pos/data/models/past_sale_model.dart';
 import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
 
 abstract class ExchangeLocalDatasource {
   Future<List<PastSaleItemModel>> searchPastSales(String query);
+  Future<List<ProductModel>> searchProducts(String query);
+
   Future<void> processExchangeTransaction({
-    required PastSaleItemEntity returnedItem, // 👈 غيرنا دي من Map لـ Entity
+    required PastSaleItemEntity returnedItem, 
     required List<CartItemModel> replacementItems,
     required double differencePaid,
   });
@@ -103,5 +106,20 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
         }
       }
     });
+  }
+  
+  @override
+  Future<List<ProductModel>> searchProducts(String query) async {
+    final db = await dbHelper.database; 
+  final List<Map<String, dynamic>> maps = await db.query(
+    'products', 
+    where: 'name LIKE ? OR code LIKE ?',
+    whereArgs: ['%$query%', '%$query%'],
+  );
+
+  // تحويل النتائج من Map إلى قائمة من ProductModel
+  return List.generate(maps.length, (i) {
+    return ProductModel.fromMap(maps[i]); 
+  });
   }
 }

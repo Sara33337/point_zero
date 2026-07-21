@@ -5,6 +5,7 @@ import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
 import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
 import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_state.dart';
+import 'package:point_zero/features/pos/presentation/widgets/return_item.dart';
 
 class ReturnItemsSection extends StatelessWidget {
   const ReturnItemsSection({super.key});
@@ -19,7 +20,7 @@ class ReturnItemsSection extends StatelessWidget {
             Text("الخطوة 1: المنتج المُسترجع", style: AppStyles.smallTitle),
             SizedBox(height: 12.h),
             CustomTextFormField(
-              hintText: "ابحث برقم الفاتورة أو كود المنتج...",
+              hintText: "ابحث بكود المنتج...",
               prefixIcon: const Icon(Icons.search),
               onChanged: (value) {
                 context.read<ExchangeCubit>().searchPastBills(value);
@@ -36,6 +37,7 @@ class ReturnItemsSection extends StatelessWidget {
                   itemCount: state.searchResults.length,
                   itemBuilder: (context, index) {
                     final result = state.searchResults[index];
+          
                     return Padding(
                       padding: EdgeInsets.only(bottom: 8.h),
                       child: ListTile(
@@ -43,16 +45,16 @@ class ReturnItemsSection extends StatelessWidget {
                           side: BorderSide(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
-                        // 👈 بنستخدم . بدل ['']
+                      
                         title: Text(result.productName),
                         subtitle: Text(
-                          "كود: ${result.productCode} | فاتورة: ${result.billId}",
+                          "كود: ${result.productCode} | رقم الفاتورة : ${result.billId}",
                         ),
-                        trailing: Text("\$${result.unitPrice}"),
+                        trailing: Text("${result.unitPrice} ج.م"),
                         onTap: () {
-                          // لما يختار نتيجة، بنبعت الـ Entity للكيوبيت
                           context.read<ExchangeCubit>().selectReturnedItem(
                             result,
+                            
                           );
                         },
                       ),
@@ -62,41 +64,7 @@ class ReturnItemsSection extends StatelessWidget {
               )
             // 3. عرض المنتج المُسترجع بعد اختياره بنجاح
             else if (state.returnedItem != null)
-              Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.orange.shade200),
-                  borderRadius: BorderRadius.circular(8.r),
-                  color: Colors.orange.shade50,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 👈 التعديل هنا: .productName بدل ['product_name']
-                        Text(
-                          state.returnedItem!.productName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          state.returnedItem!.productCode,
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      // 👈 التعديل هنا: .unitPrice بدل ['unit_price']
-                      "\$${state.returnedItem!.unitPrice}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+              ReturnItem()
             else
               Expanded(
                 child: Center(
@@ -112,3 +80,4 @@ class ReturnItemsSection extends StatelessWidget {
     );
   }
 }
+

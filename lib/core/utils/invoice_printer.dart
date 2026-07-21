@@ -29,6 +29,8 @@ class InvoicePrinter {
               pw.SizedBox(height: 5),
               pw.Text('فاتورة مبيعات', style: const pw.TextStyle(fontSize: 10)),
               pw.Text('التاريخ: ${bill.createdAt.toString().substring(0, 16)}', style: const pw.TextStyle(fontSize: 10)),
+              // pw.Text('رقم الفاتورة: ${bill.id}', style: const pw.TextStyle(fontSize: 10)),
+
               pw.SizedBox(height: 10),
               pw.Divider(borderStyle: pw.BorderStyle.dashed),
 

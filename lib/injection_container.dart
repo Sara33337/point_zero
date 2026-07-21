@@ -30,6 +30,7 @@ import 'package:point_zero/features/pos/domain/repo/pos_repo.dart';
 import 'package:point_zero/features/pos/domain/useCases/checkout_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/process_exchange_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/search_past_sale_useCase.dart';
+import 'package:point_zero/features/pos/domain/useCases/search_products_useCase.dart';
 import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
 import 'package:point_zero/features/pos/presentation/cubit/pos_cubit/pos_cubit.dart';
 
@@ -67,12 +68,13 @@ Future<void> init() async{
   sl.registerLazySingleton(()=> GetMonthlySalesDataUseCase(repository: sl()));
   sl.registerLazySingleton(()=>SearchPastSalesUseCase(sl()));
   sl.registerLazySingleton(()=>ProcessExchangeUseCase(sl()));
+  sl.registerLazySingleton(()=> SearchProductsUsecase(sl()));
 
   //cubit
   sl.registerFactory(()=>InventoryCubit(getProductsUsecase: sl(), addProductUseCase: sl(), generateUniqueCodeUseCase: sl()));
   sl.registerLazySingleton(() => AuthCubit(loginUseCase: sl()));
   sl.registerFactory(()=>PosCubit(checkoutUseCase: sl(), getProductsUseCase: sl()));
   sl.registerFactory(()=>FinanceCubit(getMonthlySalesUseCase: sl(), getMonthlyExpensesUseCase: sl(), addExpenseUseCase: sl()));
-  sl.registerFactory(()=>ExchangeCubit(searchPastSalesUseCase: sl(), processExchangeUseCase: sl()));
+  sl.registerFactory(()=>ExchangeCubit(searchPastSalesUseCase: sl(), processExchangeUseCase: sl() , searchProductsUsecase: sl()));
   
 }
