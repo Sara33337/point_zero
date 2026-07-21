@@ -13,9 +13,11 @@ class InventoryLoading extends InventoryState{}
 
 class InventoryLoaded extends InventoryState{
   final List<ProductEntity> products;
-  const InventoryLoaded({required this.products});
+  final String selectedFilter;
+  
+  const InventoryLoaded({required this.products ,  this.selectedFilter = 'الكل'});
   @override
-  List<Object> get props => [products];
+  List<Object> get props => [products , selectedFilter];
 }
 
 class ProductAddedSuccess extends InventoryState {}

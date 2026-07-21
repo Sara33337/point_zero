@@ -17,13 +17,17 @@ class InventoryCubit extends Cubit<InventoryState> {
     required this.generateUniqueCodeUseCase,
   }) : super(InventoryInitial());
 
+  List<ProductEntity> _allProducts = [];
+
   Future<void> loadProducts() async {
     emit(InventoryLoading());
     final result = await getProductsUsecase();
-    result.fold(
-      (failure) => emit(InventoryError(message: failure.message)),
-      (products) => emit(InventoryLoaded(products: products)),
-    );
+    result.fold((failure) => emit(InventoryError(message: failure.message)), (
+      products,
+    ) {
+      _allProducts = products;
+      emit(InventoryLoaded(products: _allProducts, selectedFilter: 'الكل'));
+    });
   }
 
   Future<void> addProduct(ProductEntity product) async {
@@ -37,13 +41,24 @@ class InventoryCubit extends Cubit<InventoryState> {
   }
 
   Future<String?> getNewProductCode() async {
-  final result = await generateUniqueCodeUseCase();
-  return result.fold(
-    (failure) {
-      emit(InventoryError(message: failure.message));
-      return null;
-    },
-    (code) => code, // نعيد الكود للـ UI
-  );
-}
+    final result = await generateUniqueCodeUseCase();
+    return result.fold(
+      (failure) {
+        emit(InventoryError(message: failure.message));
+        return null;
+      },
+      (code) => code, // نعيد الكود للـ UI
+    );
+  }
+
+  void changeSeasonFilter(String season) {
+    List<ProductEntity> filteredList;
+    if (season == 'الكل') {
+      filteredList = _allProducts;
+    } else {
+      filteredList = _allProducts.where((p) => p.season == season).toList();
+    }
+
+    emit(InventoryLoaded(products: filteredList, selectedFilter: season));
+  }
 }

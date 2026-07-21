@@ -1,13 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
-import 'package:point_zero/features/pos/domain/entities/bill_entity.dart';
 import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
 import 'package:point_zero/features/pos/domain/useCases/process_exchange_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/search_past_sale_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/search_products_useCase.dart';
-// ⚠️ تأكدي من مسار الـ UseCase بتاعة البحث في المنتجات العادية عندك
-// import 'package:point_zero/features/products/domain/useCases/search_products_usecase.dart';
 
 import 'exchange_state.dart';
 
@@ -63,7 +60,7 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     }
   }
   
-
+  // search for replacement items
   Future<void> searchReplacementProducts(String query) async {
     if (query.isEmpty) {
       emit(state.copyWith(isSearchingReplacement: false, replacementSearchResults: []));
@@ -91,7 +88,7 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     );
   }
 
-  // 2. دالة إضافة المنتج للسلة البديلة
+  // add replacement item to cart
   void addReplacementItem(ProductEntity product) {
     final updatedList = List<CartItemModel>.from(state.replacementItems);
 
@@ -128,7 +125,7 @@ class ExchangeCubit extends Cubit<ExchangeState> {
     _calculateTotals();
   }
 
-  // 3. دالة حذف المنتج من السلة البديلة
+  // reomve replacemnets from cart
   void removeReplacementItem(CartItemModel item) {
     final updatedList = List<CartItemModel>.from(state.replacementItems);
 
@@ -141,7 +138,7 @@ class ExchangeCubit extends Cubit<ExchangeState> {
   }
 
 
-
+  // calcuations
   void _calculateTotals() {
     double credit = 0.0;
     if (state.returnedItem != null) {
@@ -164,7 +161,8 @@ class ExchangeCubit extends Cubit<ExchangeState> {
       ),
     );
   }
-
+  
+  // submit exchange
   Future<void> submitExchange() async {
     if (state.returnedItem == null || state.replacementItems.isEmpty) return;
 
@@ -196,7 +194,8 @@ class ExchangeCubit extends Cubit<ExchangeState> {
       },
     );
   }
-
+  
+  // reset exchange screen
   void resetExchange() {
     emit(const ExchangeState()); 
   }

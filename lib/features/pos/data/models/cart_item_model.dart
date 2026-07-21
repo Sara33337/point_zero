@@ -22,6 +22,7 @@ class CartItemModel extends CartItemEntity {
       code: map['product_code'],
       name: map['product_name'],
       category: '', 
+      season: '',
       wholesalePrice: (map['wholesale_price'] as num).toDouble(),
       sellingPrice: (map['unit_price'] as num).toDouble(),
       stockQuantity: 0,

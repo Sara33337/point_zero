@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 
 class ProductModel extends ProductEntity {
@@ -6,6 +7,7 @@ class ProductModel extends ProductEntity {
     required super.code,
     required super.name,
     required super.category,
+    required super.season,
     required super.wholesalePrice,
     required super.sellingPrice,
     required super.stockQuantity,
@@ -18,6 +20,7 @@ class ProductModel extends ProductEntity {
       code: map['code'] as String,
       name: map['name'] as String,
       category: map['category'] as String,
+      season: map['season'] as String,
       wholesalePrice: (map['wholesale_price'] as num).toDouble(),
       sellingPrice: (map['selling_price'] as num).toDouble(),
       stockQuantity: map['stock_quantity'] as int,
@@ -31,6 +34,7 @@ class ProductModel extends ProductEntity {
       'code': code,
       'name': name,
       'category': category,
+      'season' : season,
       'wholesale_price': wholesalePrice,
       'selling_price': sellingPrice,
       'stock_quantity': stockQuantity,
@@ -44,6 +48,7 @@ class ProductModel extends ProductEntity {
       code: entity.code,
       name: entity.name,
       category: entity.category,
+      season:  entity.season,
       wholesalePrice: entity.wholesalePrice,
       sellingPrice: entity.sellingPrice,
       stockQuantity: entity.stockQuantity,

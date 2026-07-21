@@ -44,6 +44,7 @@ class DatabaseHelper {
         code TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
         category TEXT NOT NULL,
+        season TEXT NOT NULL,
         wholesale_price REAL NOT NULL,
         selling_price REAL NOT NULL,
         stock_quantity INTEGER NOT NULL

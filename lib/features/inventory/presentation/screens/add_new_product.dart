@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
+import 'package:point_zero/core/widgets/custom_drop_down_menu.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
@@ -24,6 +25,9 @@ class _AddProductDialogState extends State<AddProductDialog> {
   final stockQuantityController = TextEditingController();
   final categoryController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  String? selectedSeason;
+  final List<String> seasons = ['صيفي', 'شتوي'];
 
   @override
   void dispose() {
@@ -95,6 +99,17 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     readOnly: true,
                   ),
 
+                  CustomDropDownMenu(
+                    selectedItem: selectedSeason,
+                    items: seasons,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSeason = value;
+                      });
+                    },
+                    labelText: "الموسم",
+                  ),
+
                   CustomTextFormField(
                     controller: wholesalePriceController,
                     labelText: "سعر الجملة:",
@@ -162,6 +177,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
                         code: productCodeController.text,
                         name: productNameController.text,
                         category: categoryController.text,
+                        season: selectedSeason!,
                         wholesalePrice:
                             double.tryParse(wholesalePriceController.text) ??
                             0.0,
