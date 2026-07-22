@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_icons.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
-import 'package:point_zero/core/widgets/side_bar.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
 import 'package:point_zero/features/inventory/presentation/screens/product_form_dialog.dart';
@@ -20,15 +19,7 @@ class InventoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SideBar(),
-            Expanded(
-              child: Padding(
+    return  Padding(
                 padding: EdgeInsets.all(40.r),
                 child: BlocBuilder<InventoryCubit, InventoryState>(
                   builder: (context, state) {
@@ -115,12 +106,8 @@ class InventoryScreen extends StatelessWidget {
                     return const SizedBox();
                   },
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+              );
+           
   }
 }
 

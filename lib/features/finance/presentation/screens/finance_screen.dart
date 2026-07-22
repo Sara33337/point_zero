@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
-import 'package:point_zero/core/widgets/side_bar.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_cubit.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_state.dart';
 import 'package:point_zero/features/finance/presentation/widgets/add_expense.dart';
@@ -17,16 +16,7 @@ class FinanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backGroundColor,
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SideBar(),
-            Expanded(
-              child: Padding(
+    return  Padding(
                 padding: EdgeInsets.all(30.r),
                 child: BlocBuilder<FinanceCubit, FinanceState>(
                   builder: (context, state) {
@@ -112,12 +102,7 @@ class FinanceScreen extends StatelessWidget {
                     );
                   },
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+              );    
   }
 }
 

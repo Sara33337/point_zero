@@ -68,6 +68,6 @@ class ExpenseHistoryTable extends StatelessWidget {
           ),
         ],
       ),
-    );;
+    );
   }
 }
