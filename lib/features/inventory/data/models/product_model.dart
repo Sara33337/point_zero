@@ -1,4 +1,3 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 
 class ProductModel extends ProductEntity {

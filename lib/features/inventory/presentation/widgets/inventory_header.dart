@@ -5,7 +5,7 @@ import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
-import 'package:point_zero/features/inventory/presentation/screens/add_new_product.dart';
+import 'package:point_zero/features/inventory/presentation/screens/product_form_dialog.dart';
 
 class InventoryHeader extends StatelessWidget {
   const InventoryHeader({
@@ -87,10 +87,10 @@ class InventoryHeader extends StatelessWidget {
               context: context,
               builder: (_) => BlocProvider.value(
                 value: inventoryCubit,
-                child: AddProductDialog(
-                  onAdd: (product) {
+                child: ProductFormDialog(
+                  onSubmit: (newpProduct) {
                     context.read<InventoryCubit>().addProduct(
-                      product,
+                      newpProduct,
                     );
                   },
                 ),

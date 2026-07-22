@@ -8,16 +8,22 @@ import 'package:point_zero/features/inventory/domain/entites/product_entity.dart
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
 
-class AddProductDialog extends StatefulWidget {
-  final Function(ProductEntity product) onAdd;
+class ProductFormDialog extends StatefulWidget {
+  // 👈 1. ضفنا متغير اختياري للمنتج
+  final ProductEntity? productToEdit; 
+  final Function(ProductEntity product) onSubmit;
 
-  const AddProductDialog({super.key, required this.onAdd});
+  const ProductFormDialog({
+    super.key, 
+    this.productToEdit, 
+    required this.onSubmit,
+  });
 
   @override
-  State<AddProductDialog> createState() => _AddProductDialogState();
+  State<ProductFormDialog> createState() => _ProductFormDialogState();
 }
 
-class _AddProductDialogState extends State<AddProductDialog> {
+class _ProductFormDialogState extends State<ProductFormDialog> {
   final productNameController = TextEditingController();
   final productCodeController = TextEditingController();
   final wholesalePriceController = TextEditingController();
@@ -29,22 +35,27 @@ class _AddProductDialogState extends State<AddProductDialog> {
   String? selectedSeason;
   final List<String> seasons = ['صيفي', 'شتوي'];
 
-  @override
-  void dispose() {
-    productNameController.dispose();
-    productCodeController.dispose();
-    wholesalePriceController.dispose();
-    sellingPriceController.dispose();
-    stockQuantityController.dispose();
-    categoryController.dispose();
-
-    super.dispose();
-  }
+  // 👈 متغير عشان نعرف إحنا بنعدل ولا بنضيف
+  bool get isEditing => widget.productToEdit != null;
 
   @override
   void initState() {
     super.initState();
-    _initializeAutoCode();
+    
+    // 👈 2. لو بنعدل، نملأ الحقول ببيانات المنتج القديمة
+    if (isEditing) {
+      final p = widget.productToEdit!;
+      productNameController.text = p.name;
+      productCodeController.text = p.code;
+      wholesalePriceController.text = p.wholesalePrice.toString();
+      sellingPriceController.text = p.sellingPrice.toString();
+      stockQuantityController.text = p.stockQuantity.toString();
+      categoryController.text = p.category;
+      selectedSeason = p.season;
+    } else {
+      // 👈 لو بنضيف منتج جديد، نجيب كود جديد
+      _initializeAutoCode();
+    }
   }
 
   Future<void> _initializeAutoCode() async {
@@ -62,6 +73,17 @@ class _AddProductDialogState extends State<AddProductDialog> {
   }
 
   @override
+  void dispose() {
+    productNameController.dispose();
+    productCodeController.dispose();
+    wholesalePriceController.dispose();
+    sellingPriceController.dispose();
+    stockQuantityController.dispose();
+    categoryController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -69,7 +91,6 @@ class _AddProductDialogState extends State<AddProductDialog> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.r),
         ),
-
         child: Padding(
           padding: EdgeInsets.all(18.r),
           child: Form(
@@ -78,9 +99,12 @@ class _AddProductDialogState extends State<AddProductDialog> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 spacing: 20.h,
-
                 children: [
-                  Text("إضافة منتج جديد", style: AppStyles.largeTitle),
+                  // 👈 3. تغيير العنوان ديناميكياً
+                  Text(
+                    isEditing ? "تعديل المنتج" : "إضافة منتج جديد", 
+                    style: AppStyles.largeTitle
+                  ),
 
                   CustomTextFormField(
                     controller: productNameController,
@@ -96,7 +120,7 @@ class _AddProductDialogState extends State<AddProductDialog> {
                   CustomTextFormField(
                     controller: productCodeController,
                     labelText: "كود المنتج:",
-                    readOnly: true,
+                    readOnly: true, // الكود مبيتعدلش في الحالتين
                   ),
 
                   CustomDropDownMenu(
@@ -115,14 +139,8 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     labelText: "سعر الجملة:",
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "أدخل سعر الجملة";
-                      }
-
-                      if (double.tryParse(value) == null) {
-                        return "أدخل رقم صحيح";
-                      }
-
+                      if (value == null || value.trim().isEmpty) return "أدخل سعر الجملة";
+                      if (double.tryParse(value) == null) return "أدخل رقم صحيح";
                       return null;
                     },
                   ),
@@ -132,14 +150,8 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     labelText: "سعر البيع:",
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "أدخل سعر البيع";
-                      }
-
-                      if (double.tryParse(value) == null) {
-                        return "أدخل رقم صحيح";
-                      }
-
+                      if (value == null || value.trim().isEmpty) return "أدخل سعر البيع";
+                      if (double.tryParse(value) == null) return "أدخل رقم صحيح";
                       return null;
                     },
                   ),
@@ -154,41 +166,32 @@ class _AddProductDialogState extends State<AddProductDialog> {
                     labelText: "الكمية :",
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "أدخل الكمية";
-                      }
-
-                      if (int.tryParse(value) == null) {
-                        return "أدخل رقم صحيح";
-                      }
-
+                      if (value == null || value.trim().isEmpty) return "أدخل الكمية";
+                      if (int.tryParse(value) == null) return "أدخل رقم صحيح";
                       return null;
                     },
                   ),
 
                   PrimaryButton(
-                    buttonText: "إضافة",
-
+                    // 👈 4. تغيير نص الزرار ديناميكياً
+                    buttonText: isEditing ? "حفظ التعديلات" : "إضافة",
                     onTap: () {
-                      if (!_formKey.currentState!.validate()) {
-                        return;
-                      }
+                      if (!_formKey.currentState!.validate()) return;
+                      if (selectedSeason == null) return; // يفضل إضافة رسالة خطأ هنا لو مفيش موسم
+                      
                       final product = ProductEntity(
+                        // لو بنعدل، نحافظ على الـ ID القديم (لو موجود)، ولو بنضيف نسيبه فاضي عشان الداتابيز تعمله
+                        id: isEditing ? widget.productToEdit!.id : 0, 
                         code: productCodeController.text,
                         name: productNameController.text,
                         category: categoryController.text,
                         season: selectedSeason!,
-                        wholesalePrice:
-                            double.tryParse(wholesalePriceController.text) ??
-                            0.0,
-                        sellingPrice:
-                            double.tryParse(sellingPriceController.text) ?? 0.0,
-                        stockQuantity:
-                            int.tryParse(stockQuantityController.text) ?? 0,
+                        wholesalePrice: double.tryParse(wholesalePriceController.text) ?? 0.0,
+                        sellingPrice: double.tryParse(sellingPriceController.text) ?? 0.0,
+                        stockQuantity: int.tryParse(stockQuantityController.text) ?? 0,
                       );
 
-                      widget.onAdd(product);
-
+                      widget.onSubmit(product);
                       Navigator.pop(context);
                     },
                   ),

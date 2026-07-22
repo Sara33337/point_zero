@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
 
 class StatCard extends StatelessWidget {
@@ -7,6 +8,8 @@ class StatCard extends StatelessWidget {
   final double amount;
   final Color color;
   final IconData icon;
+  final Color backGroundColor;
+  final Color fontColor;
 
   const StatCard({
     super.key,
@@ -14,6 +17,8 @@ class StatCard extends StatelessWidget {
     required this.amount,
     required this.color,
     required this.icon,
+    this.backGroundColor = Colors.white,
+    this.fontColor = AppColors.primaryColor
   });
 
   @override
@@ -21,7 +26,7 @@ class StatCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backGroundColor,
         borderRadius: AppStyles.mainBorderRadius,
         boxShadow: [
          AppStyles.cardShadow
@@ -44,7 +49,7 @@ class StatCard extends StatelessWidget {
           SizedBox(height: 10.h),
           Text(
             "${amount.toStringAsFixed(2)} ج.م",
-            style: AppStyles.largeTitle,
+            style: AppStyles.largeTitle.copyWith(color: fontColor),
           ),
         ],
       ),

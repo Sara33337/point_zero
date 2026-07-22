@@ -7,6 +7,8 @@ import 'package:point_zero/core/widgets/side_bar.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_cubit.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_state.dart';
 import 'package:point_zero/features/finance/presentation/widgets/add_expense.dart';
+import 'package:point_zero/features/finance/presentation/widgets/change_month_year.dart';
+import 'package:point_zero/features/finance/presentation/widgets/expense_history_table.dart';
 import 'package:point_zero/features/finance/presentation/widgets/sales_history_tabel.dart';
 import 'package:point_zero/features/finance/presentation/widgets/state_card.dart';
 
@@ -15,7 +17,6 @@ class FinanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: AppColors.backGroundColor,
       body: Directionality(
@@ -44,14 +45,11 @@ class FinanceScreen extends StatelessWidget {
                               "الأرباح والمصروفات",
                               style: AppStyles.largeTitle,
                             ),
-                            Text(
-                              "شهر ${state.currentMonth} - ${state.currentYear}",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.greyColor,
-                              ),
-                            ),
+                            ChangeMonthYear(),
+                            // Text(
+                            //   "شهر ${state.currentMonth} - ${state.currentYear}",
+                            //   style: AppStyles.largeTitle,
+                            // ),
                           ],
                         ),
                         SizedBox(height: 24.h),
@@ -67,7 +65,7 @@ class FinanceScreen extends StatelessWidget {
                                 icon: Icons.arrow_upward_rounded,
                               ),
                             ),
-                            SizedBox(width: 16.w),
+                            SizedBox(width: 6.w),
                             Expanded(
                               child: StatCard(
                                 title: "إجمالي المصروفات",
@@ -76,12 +74,14 @@ class FinanceScreen extends StatelessWidget {
                                 icon: Icons.arrow_downward_rounded,
                               ),
                             ),
-                            SizedBox(width: 16.w),
+                            SizedBox(width: 6.w),
                             Expanded(
                               child: StatCard(
+                                backGroundColor: AppColors.primaryColor,
+                                fontColor: AppColors.secondaryColor,
                                 title: "صافي الربح",
                                 amount: state.netProfit,
-                                color: const Color(0xFF1E1E1E),
+                                color: AppColors.lightGreyColor,
                                 icon: Icons.account_balance_wallet_rounded,
                               ),
                             ),
@@ -97,12 +97,14 @@ class FinanceScreen extends StatelessWidget {
                                 flex: 3,
                                 child: SalesHistoryTable(bills: state.bills),
                               ),
-                              SizedBox(width: 24.w),
-                              Expanded(
-                                flex: 1,
-                                // لو عاملة فورم المصروفات، هيتحط هنا
-                                child: const AddExpenseForm(),
-                              ),
+                              SizedBox(width: 6.w),
+                              Expanded(flex: 2, child: Column(
+                                children: [
+                                  const AddExpenseForm(),
+                                  const SizedBox(height: 4,),
+                                  Expanded(child: ExpenseHistoryTable(expenses: state.expenses))
+                                ],
+                              )),
                             ],
                           ),
                         ),
@@ -118,3 +120,4 @@ class FinanceScreen extends StatelessWidget {
     );
   }
 }
+

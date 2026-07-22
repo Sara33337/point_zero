@@ -7,4 +7,5 @@ class AppIcons {
   static const searchIcon = "assets/icons/search.svg";
   static const cashierIcon = "assets/icons/cashier.svg";
   static const managerIcon = "assets/icons/manager.svg";
+  static const editIcon = "assets/icons/edit.svg";
 }

@@ -18,6 +18,8 @@ import 'package:point_zero/features/inventory/data/data_source/inventory_local_d
 import 'package:point_zero/features/inventory/data/repo/inventory_repo_impl.dart';
 import 'package:point_zero/features/inventory/domain/repo/inventory_repo.dart';
 import 'package:point_zero/features/inventory/domain/useCases/add_product_usecase.dart';
+import 'package:point_zero/features/inventory/domain/useCases/delete_product_useCase.dart';
+import 'package:point_zero/features/inventory/domain/useCases/edit_product_useCase.dart';
 import 'package:point_zero/features/inventory/domain/useCases/generate_code_useCase.dart';
 import 'package:point_zero/features/inventory/domain/useCases/get_products_usecase.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
@@ -61,6 +63,8 @@ Future<void> init() async{
   sl.registerLazySingleton(() => AddProductUseCase(sl()));
   sl.registerLazySingleton(()=> GetProductsUsecase(repository: sl()));
   sl.registerLazySingleton(()=>GenerateUniqueCodeUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProductUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProductUseCase(sl()));
   sl.registerLazySingleton(()=> LoginUseCase(sl()));
   sl.registerLazySingleton(()=> CheckoutUseCase(sl()));
   sl.registerLazySingleton(()=> AddExpenseUseCase(repository: sl()));
@@ -71,7 +75,7 @@ Future<void> init() async{
   sl.registerLazySingleton(()=> SearchProductsUsecase(sl()));
 
   //cubit
-  sl.registerFactory(()=>InventoryCubit(getProductsUsecase: sl(), addProductUseCase: sl(), generateUniqueCodeUseCase: sl()));
+  sl.registerFactory(()=>InventoryCubit(getProductsUsecase: sl(), addProductUseCase: sl(), generateUniqueCodeUseCase: sl(), deleteProductUseCase: sl() , updateProductUseCase: sl()));
   sl.registerLazySingleton(() => AuthCubit(loginUseCase: sl()));
   sl.registerFactory(()=>PosCubit(checkoutUseCase: sl(), getProductsUseCase: sl()));
   sl.registerFactory(()=>FinanceCubit(getMonthlySalesUseCase: sl(), getMonthlyExpensesUseCase: sl(), addExpenseUseCase: sl()));

@@ -13,12 +13,14 @@ class TabelHeader extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: const Row(
         children: [
-          Expanded(child: Text("اسم المنتج")),
+          Expanded(flex : 2 ,child: Text("اسم المنتج")),
           Expanded(child: Text("الكود")),
           Expanded(child: Text("الفئة")),
           Expanded(child: Text("سعر الجملة")),
           Expanded(child: Text("سعر البيع")),
           Expanded(child: Text("الكمية")),
+          Expanded(child: Text("إجراء")),
+
         ],
       ),
     );

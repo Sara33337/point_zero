@@ -22,7 +22,6 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
   }
 
   @override
-  @override
   Future<List<BillModel>> getBillsByMonth(int month, int year) async {
     final db = await dbHelper.database;
     final String monthStr = month < 10 ? '0$month' : '$month';
@@ -37,21 +36,23 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
 
     List<BillModel> completeBills = [];
 
-    // 2. بنلف على كل فاتورة نجيب منتجاتها (من جدول bill_items)
     for (var billMap in billMaps) {
       final int billId = billMap['id'] as int;
 
-      // سحب المنتجات المرتبطة برقم الفاتورة
-      final List<Map<String, dynamic>> itemMaps = await db.query(
-        'bill_items', // 👈 الاسم هنا مظبوط على الداتابيز بتاعتك
-        where: 'bill_id = ?',
-        whereArgs: [billId],
+      final List<Map<String, dynamic>> itemMaps = await db.rawQuery(
+        '''
+        SELECT 
+          bi.*, 
+          p.selling_price AS original_price 
+        FROM bill_items bi
+        LEFT JOIN products p ON bi.product_code = p.code
+        WHERE bi.bill_id = ?
+        ''',
+        [billId],
       );
 
-      // تحويل المنتجات لـ Models
       final items = itemMaps.map((item) => CartItemModel.fromMap(item)).toList();
 
-      // تجميع الفاتورة
       completeBills.add(
         BillModel(
           id: billId,
@@ -61,8 +62,6 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
         ),
       );
     }
-
-    print("✅ تم سحب ${completeBills.length} فواتير كاملة بمنتجاتها!");
     return completeBills;
   }
 

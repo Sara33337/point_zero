@@ -102,4 +102,6 @@ class FinanceCubit extends Cubit<FinanceState> {
   void changeMonth(int month, int year) {
     loadMonthlyData(month: month, year: year);
   }
+
+  
 }

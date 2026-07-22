@@ -13,12 +13,6 @@ import 'package:point_zero/injection_container.dart' as di;
 
 final GoRouter router = GoRouter(
   routes: <RouteBase>[
-    // GoRoute(
-    //   path: '/',
-    //   builder: (BuildContext context, GoRouterState state) {
-    //      return LoginScreen();
-    //   },
-    // ),
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
@@ -47,7 +41,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/inventory_screen',
       builder: (BuildContext context, GoRouterState state) {
-        return BlocProvider(
+        return 
+        BlocProvider(
           create: (_) => di.sl<InventoryCubit>()..loadProducts(),
 
           child: InventoryScreen(),

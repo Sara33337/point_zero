@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_cubit.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
@@ -47,7 +48,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: AppStyles.mainBorderRadius,
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(

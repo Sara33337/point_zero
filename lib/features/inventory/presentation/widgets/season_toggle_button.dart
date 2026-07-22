@@ -24,8 +24,8 @@ class SeasonToggleButtons extends StatelessWidget {
         return GestureDetector(
           onTap: () => onFilterChanged(filter),
           child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 5.w),
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+            margin: EdgeInsets.symmetric(horizontal: 3.w),
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
             decoration: BoxDecoration(
               color: isSelected ? AppColors.secondaryColor : Colors.transparent,
               borderRadius: AppStyles.mainBorderRadius,

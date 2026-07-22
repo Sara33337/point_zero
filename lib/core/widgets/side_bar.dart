@@ -16,6 +16,7 @@ class SideBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String currentPath = GoRouterState.of(context).uri.toString();
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         String currentRole = "cashier";
@@ -35,8 +36,11 @@ class SideBar extends StatelessWidget {
                 Center(child: Text("Point Zero", style: AppStyles.brandName)),
                 SizedBox(height: 20.h),
                 Text("الإدارة", style: AppStyles.smallTitle),
+                SizedBox(height: 10.h),
+
                 if (currentRole == "manager") ...[
                   Category(
+                    isSelected: currentPath == '/inventory_screen',
                     categoryName: "المخزن",
                     icon: AppIcons.storeIcon,
                     onTap: () {
@@ -44,28 +48,26 @@ class SideBar extends StatelessWidget {
                     },
                   ),
                   Category(
+                    isSelected: currentPath == '/finance_screen',
                     categoryName: "الأرباح & المصروفات",
                     icon: AppIcons.walletIcon,
                     onTap: () {
                       context.go('/finance_screen');
                     },
                   ),
-                  // Category(
-                  //   categoryName: "المبيعات",
-                  //   icon: AppIcons.sellsIcons,
-                  //   onTap: () {},
-                  // ),
                 ],
 
                 if (currentRole == "cashier")
-
-                Category(
-                  categoryName: "نقاط البيع",
-                  icon: AppIcons.posIcon,
-                  onTap: () {
-                    context.go('/');
-                  },
-                ),
+                  Category(
+                    isSelected: currentPath == '/',
+                    categoryName: "نقاط البيع",
+                    icon: AppIcons.posIcon,
+                    onTap: () {
+                      if (currentPath != '/') {
+                        context.go('/');
+                      }
+                    },
+                  ),
 
                 const Spacer(),
                 Center(
@@ -78,7 +80,7 @@ class SideBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                Divider(color: AppColors.greyColor,),
+                Divider(color: AppColors.greyColor),
                 SizedBox(height: 8.h),
                 Container(
                   decoration: BoxDecoration(
@@ -90,9 +92,9 @@ class SideBar extends StatelessWidget {
                       // زرار الكاشير
                       ActiveRoleButton(
                         currentRole: currentRole,
-                        targetRole: 'cashier', 
+                        targetRole: 'cashier',
                         buttonText: "كاشير",
-                        icon: AppIcons.managerIcon,
+                        icon: AppIcons.cashierIcon,
                         onTap: () {
                           if (currentRole == 'manager') {
                             context.read<AuthCubit>().logout();
@@ -104,14 +106,12 @@ class SideBar extends StatelessWidget {
                       // زرار المدير
                       ActiveRoleButton(
                         currentRole: currentRole,
-                        targetRole: 'manager', 
+                        targetRole: 'manager',
                         buttonText: "مدير",
-                        icon: AppIcons.cashierIcon,
+                        icon: AppIcons.managerIcon,
                         onTap: () {
                           if (currentRole == 'cashier') {
                             showManagerLoginDialog(context);
-                           
-                           
                           }
                         },
                       ),

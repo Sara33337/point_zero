@@ -10,7 +10,7 @@ class AppStyles {
     letterSpacing: 1.8,
   );
   static TextStyle categoryFont = TextStyle(
-    fontSize: 5.sp,
+    fontSize: 4.5.sp,
     fontWeight: FontWeight.w800,
     color: AppColors.lightFontColor,
   );

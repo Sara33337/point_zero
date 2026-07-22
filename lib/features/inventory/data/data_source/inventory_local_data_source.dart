@@ -7,6 +7,8 @@ abstract class InventoryLocalDataSource {
   Future<void> addProduct(ProductModel product);
   Future<List<ProductModel>> getProduct();
   Future<bool> checkCodeExists(String code);
+  Future<void> deleteProduct(String code);
+  Future<void> updateProduct(ProductModel product);
 }
 
 class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
@@ -59,5 +61,23 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
     } catch (e) {
       throw LocalDatabaseException(message: 'فشل التحقق من كود المنتج');
     }
+  }
+
+  @override
+  Future<void> deleteProduct(String code) async {
+    final db = await dbHelper.database;
+    await db.delete('products', where: 'code = ?', whereArgs: [code]);
+    
+  }
+
+  @override
+  Future<void> updateProduct(ProductModel product) async {
+    final db = await dbHelper.database;
+    await db.update(
+      'products',
+      product.toMap(),
+      where: 'code = ?',
+      whereArgs: [product.code],
+    );
   }
 }

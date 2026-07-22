@@ -47,13 +47,11 @@ void showManagerLoginDialog(BuildContext context) {
               final password = passwordController.text.trim();
 
               if (password == '1234') {
-                // الباسورد صح -> نفعل دور المدير ونقفل النافذة
                 context.read<AuthCubit>().loginAsManager(password);
                 Navigator.pop(dialogContext);
                 context.go('/inventory_screen');
               } else {
-                // الباسورد غلط -> نطلع له رسالة (SnackBar)
-                Navigator.pop(dialogContext); // نقفل النافذة الأول
+                Navigator.pop(dialogContext); 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
