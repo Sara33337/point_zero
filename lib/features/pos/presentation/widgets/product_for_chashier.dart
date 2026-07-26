@@ -34,13 +34,13 @@ class ProductForCashier extends StatelessWidget {
           children: [
             CustomBadge(product: product),
             SizedBox(height: 4.h),
-            Text(
-              product.code,
-              style: AppStyles.smallTitle.copyWith(
-                fontSize: 4.sp,
-                color: AppColors.primaryColor,
-              ),
-            ),
+            // Text(
+            //   product.code,
+            //   style: AppStyles.smallTitle.copyWith(
+            //     fontSize: 4.sp,
+            //     color: AppColors.primaryColor,
+            //   ),
+            // ),
             Text(
               product.name,
               style: AppStyles.smallTitle.copyWith(

@@ -118,6 +118,15 @@ class SideBar extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(height: 10.h,),
+                Center(
+                  child: Text(
+                    textDirection: TextDirection.ltr,
+                
+                    "Copyright © 2026 Sarah. All Rights Reserved.",
+                    style: AppStyles.copyRights,
+                  ),
+                ),
               ],
             ),
           ),

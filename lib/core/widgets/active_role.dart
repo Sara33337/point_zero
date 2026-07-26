@@ -41,6 +41,7 @@ class ActiveRoleButton extends StatelessWidget {
                 icon,
                 width: 8.w,
                 height: 8.w,
+               
                  color: isActive ? Colors.white : Colors.grey,),
             
               SizedBox(width: 2.w),

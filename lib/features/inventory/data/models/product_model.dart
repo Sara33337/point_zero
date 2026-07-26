@@ -29,7 +29,7 @@ class ProductModel extends ProductEntity {
   // Convert dart model to map which SQLite can deal with while inserting or updating.
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) 'id': id,
+      if (id != null && id != 0) 'id': id,
       'code': code,
       'name': name,
       'category': category,

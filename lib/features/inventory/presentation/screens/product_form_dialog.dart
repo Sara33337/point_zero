@@ -9,7 +9,6 @@ import 'package:point_zero/features/inventory/presentation/inventory_cubit/inven
 import 'package:point_zero/core/widgets/custom_text_field.dart';
 
 class ProductFormDialog extends StatefulWidget {
-  // 👈 1. ضفنا متغير اختياري للمنتج
   final ProductEntity? productToEdit; 
   final Function(ProductEntity product) onSubmit;
 
@@ -156,10 +155,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                     },
                   ),
 
-                  CustomTextFormField(
-                    controller: categoryController,
-                    labelText: "الفئة :",
-                  ),
+                  // CustomTextFormField(
+                  //   controller: categoryController,
+                  //   labelText: "الفئة :",
+                  // ),
 
                   CustomTextFormField(
                     controller: stockQuantityController,

@@ -20,7 +20,7 @@ class CustomBadge extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         child: Center(
           child: Text(
-            product.category,
+            product.code,
             style: AppStyles.smallTitle.copyWith(fontSize: 4.sp, color: AppColors.greyColor, fontWeight: FontWeight.w600),
           ),
         ),

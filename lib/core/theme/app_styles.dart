@@ -43,6 +43,12 @@ class AppStyles {
     fontSize: 4.sp,
   );
 
+  static TextStyle copyRights = TextStyle(
+    fontWeight: FontWeight.w800,
+    color: AppColors.lightGreyColor,
+    fontSize: 3.sp,
+  );
+
   static BoxShadow cardShadow = BoxShadow(
     color: Colors.black.withOpacity(0.05),
     blurRadius: 10,
@@ -50,4 +56,5 @@ class AppStyles {
   );
 
   static BorderRadius mainBorderRadius = BorderRadius.circular(20.r);
+
 }

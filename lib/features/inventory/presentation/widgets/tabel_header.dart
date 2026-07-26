@@ -15,7 +15,7 @@ class TabelHeader extends StatelessWidget {
         children: [
           Expanded(flex : 2 ,child: Text("اسم المنتج")),
           Expanded(child: Text("الكود")),
-          Expanded(child: Text("الفئة")),
+          Expanded(child: Text("الموسم")),
           Expanded(child: Text("سعر الجملة")),
           Expanded(child: Text("سعر البيع")),
           Expanded(child: Text("الكمية")),

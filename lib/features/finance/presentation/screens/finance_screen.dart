@@ -44,7 +44,7 @@ class FinanceScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 24.h),
 
-                        // كروت الإحصائيات (بتقرأ مباشرة من الـ state)
+                
                         Row(
                           children: [
                             Expanded(

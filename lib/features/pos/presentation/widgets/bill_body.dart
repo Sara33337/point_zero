@@ -73,7 +73,7 @@ class BillBody extends StatelessWidget {
                   children: [
                     Text("الإجمالي:", style: AppStyles.smallTitle),
                     Text(
-                      "\$${state.totalAmount.toStringAsFixed(2)}",
+                      "${state.totalAmount.toStringAsFixed(2)} ج.م",
                       style: AppStyles.largeTitle,
                     ),
                   ],

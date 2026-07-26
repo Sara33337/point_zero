@@ -17,7 +17,7 @@ class TotalBlock extends StatelessWidget {
         Text(label, style: TextStyle(fontSize: 6.sp, color: Colors.grey.shade600)),
         SizedBox(height: 4.h),
         Text(
-          "\$$amount",
+          "$amount ج.م",
           style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold, color: color),
         ),
       ],

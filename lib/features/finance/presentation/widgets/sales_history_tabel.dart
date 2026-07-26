@@ -63,7 +63,6 @@ class SalesHistoryTable extends StatelessWidget {
             ),
           ),
 
-          // سطور البيانات
           Expanded(
             child: soldItems.isEmpty
                 ? const Center(child: Text("لا توجد مبيعات في هذا الشهر"))
@@ -73,7 +72,7 @@ class SalesHistoryTable extends StatelessWidget {
                         const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final item = soldItems[index];
-                      // تلوين سعر البيع لو فيه خصم
+                 
                       final isDiscounted =
                           item['soldPrice'] < item['originalPrice'];
                       DateTime dateObj = item['date'] is String
@@ -92,10 +91,10 @@ class SalesHistoryTable extends StatelessWidget {
                             Expanded(child: Text(formattedDate)),
                             Expanded(child: Text(item['name'])),
                             Expanded(child: Text(item['code'])),
-                            Expanded(child: Text("\$${item['originalPrice']}")),
+                            Expanded(child: Text("${item['originalPrice']} ج.م")),
                             Expanded(
                               child: Text(
-                                "\$${item['soldPrice']}",
+                                "${item['soldPrice']} ج.م",
                                 style: TextStyle(
                                   color: isDiscounted
                                       ? Colors.red

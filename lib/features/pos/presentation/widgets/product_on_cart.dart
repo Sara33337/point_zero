@@ -46,7 +46,7 @@ class ProductOnCart extends StatelessWidget {
                   cartItem.product.name,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 10.sp,
+                    fontSize: 8.sp,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -63,7 +63,7 @@ class ProductOnCart extends StatelessWidget {
 
           Text(
             cartItem.product.code,
-            style: TextStyle(color: Colors.grey, fontSize: 8.sp),
+            style: TextStyle(color: Colors.grey, fontSize: 6.sp),
           ),
           SizedBox(height: 12.h),
 

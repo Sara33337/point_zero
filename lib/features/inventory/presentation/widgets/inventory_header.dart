@@ -28,10 +28,10 @@ class InventoryHeader extends StatelessWidget {
                 if (state is InventoryLoaded) {
                   final productCount = state.products.length;
     
-                  final categoryCount = state.products
-                      .map((e) => e.category)
-                      .toSet()
-                      .length;
+                  // final categoryCount = state.products
+                  //     .map((e) => e.category)
+                  //     .toSet()
+                  //     .length;
     
                   final totalProductStock = state.products
                       .fold<int>(
@@ -56,7 +56,7 @@ class InventoryHeader extends StatelessWidget {
                         CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "$productCount منتجات خلال $categoryCount فئات",
+                      "يوجد في المخزن $productCount منتجات",
                         style: TextStyle(
                           color: AppColors.greyColor,
                           fontSize: 5.sp,
@@ -74,7 +74,7 @@ class InventoryHeader extends StatelessWidget {
                   );
                 }
     
-                return const Text("0 منتج خلال 0 فئات");
+                return const Text("لايوجد منتجات حاليا في المخزن");
               },
             ),
           ],

@@ -49,7 +49,7 @@ void showMonthYearPicker(BuildContext context, FinanceState state) {
             actions: [
               SecondaryButton(
                 buttonText: "إالغاء",
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.pop(dialogContext),
               ),
               SizedBox(height: 8.h,),
               PrimaryButton(
@@ -58,7 +58,7 @@ void showMonthYearPicker(BuildContext context, FinanceState state) {
                     selectedMonth,
                     selectedYear,
                   );
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                 },
                 buttonText: "عرض البيانات",
               ),

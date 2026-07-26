@@ -17,11 +17,7 @@ class UnitPriceField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          "\$",
-          style: TextStyle(color: Colors.grey, fontSize: 6.sp),
-        ),
-        SizedBox(width: 4.w),
+       
         SizedBox(
           width: 38.w, // حجم ثابت عشان ميعملش Layout Error
           height: 30.h,
@@ -41,6 +37,12 @@ class UnitPriceField extends StatelessWidget {
             ),
             onChanged: onPriceChanged,
           ),
+        ),
+        SizedBox(width: 2.w),
+
+         Text(
+          "ج.م",
+          style: TextStyle(color: Colors.grey, fontSize: 6.sp),
         ),
       ],
     );

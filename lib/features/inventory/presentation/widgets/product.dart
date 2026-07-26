@@ -27,7 +27,7 @@ class ProductDetails extends StatelessWidget {
         children: [
           Expanded(flex: 2, child: Text(product.name)),
           Expanded(child: Text(product.code)),
-          Expanded(child: Text(product.category)),
+          Expanded(child: Text(product.season)),
           Expanded(child: Text("${product.wholesalePrice}")),
           Expanded(child: Text("${product.sellingPrice}")),
           Expanded(child: Text("${product.stockQuantity}")),
