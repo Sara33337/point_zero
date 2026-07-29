@@ -57,7 +57,7 @@ class SideBar extends StatelessWidget {
                   ),
                 ],
 
-                if (currentRole == "cashier")
+                if (currentRole == "cashier") ...[
                   Category(
                     isSelected: currentPath == '/',
                     categoryName: "نقاط البيع",
@@ -68,6 +68,15 @@ class SideBar extends StatelessWidget {
                       }
                     },
                   ),
+                  Category(
+                    isSelected: currentPath == '/sales_screen',
+                    categoryName: "المبيعات",
+                    icon: AppIcons.posIcon,
+                    onTap: () {
+                      context.go('/sales_screen');
+                    },
+                  ),
+                ],
 
                 const Spacer(),
                 Center(
@@ -118,11 +127,11 @@ class SideBar extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 10.h,),
+                SizedBox(height: 10.h),
                 Center(
                   child: Text(
                     textDirection: TextDirection.ltr,
-                
+
                     "Copyright © 2026 Sarah. All Rights Reserved.",
                     style: AppStyles.copyRights,
                   ),
