@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_cubit.dart';
 import 'package:point_zero/features/pos/presentation/cubit/pos_cubit/pos_cubit.dart';
-import 'package:point_zero/features/pos/presentation/screens/exchange_screen.dart'; // زرار الدفع بتاعك
+import 'package:point_zero/features/exchange/presentation/screens/exchange_screen.dart'; // زرار الدفع بتاعك
 
 void showExchangeDialog(BuildContext context) {
   final exchangeCubit = context.read<ExchangeCubit>();

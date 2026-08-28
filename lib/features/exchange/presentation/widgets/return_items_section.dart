@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_state.dart';
-import 'package:point_zero/features/pos/presentation/widgets/return_item.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_cubit.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_state.dart';
+import 'package:point_zero/features/exchange/presentation/widgets/return_item.dart';
 
 class ReturnItemsSection extends StatelessWidget {
   const ReturnItemsSection({super.key});

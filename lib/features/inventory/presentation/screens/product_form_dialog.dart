@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
+import 'package:point_zero/core/utils/invoice_printer.dart';
 import 'package:point_zero/core/widgets/custom_drop_down_menu.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
@@ -33,15 +34,12 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
 
   String? selectedSeason;
   final List<String> seasons = ['صيفي', 'شتوي'];
-
-  // 👈 متغير عشان نعرف إحنا بنعدل ولا بنضيف
   bool get isEditing => widget.productToEdit != null;
 
   @override
   void initState() {
     super.initState();
     
-    // 👈 2. لو بنعدل، نملأ الحقول ببيانات المنتج القديمة
     if (isEditing) {
       final p = widget.productToEdit!;
       productNameController.text = p.name;
@@ -52,7 +50,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       categoryController.text = p.category;
       selectedSeason = p.season;
     } else {
-      // 👈 لو بنضيف منتج جديد، نجيب كود جديد
+   
       _initializeAutoCode();
     }
   }
@@ -155,10 +153,6 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                     },
                   ),
 
-                  // CustomTextFormField(
-                  //   controller: categoryController,
-                  //   labelText: "الفئة :",
-                  // ),
 
                   CustomTextFormField(
                     controller: stockQuantityController,
@@ -172,14 +166,17 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                   ),
 
                   PrimaryButton(
-                    // 👈 4. تغيير نص الزرار ديناميكياً
                     buttonText: isEditing ? "حفظ التعديلات" : "إضافة",
-                    onTap: () {
+                    onTap: () async { // 👈 خليناها async
                       if (!_formKey.currentState!.validate()) return;
-                      if (selectedSeason == null) return; // يفضل إضافة رسالة خطأ هنا لو مفيش موسم
+                      if (selectedSeason == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('برجاء اختيار الموسم')),
+                        );
+                        return;
+                      }
                       
                       final product = ProductEntity(
-                        // لو بنعدل، نحافظ على الـ ID القديم (لو موجود)، ولو بنضيف نسيبه فاضي عشان الداتابيز تعمله
                         id: isEditing ? widget.productToEdit!.id : 0, 
                         code: productCodeController.text,
                         name: productNameController.text,
@@ -190,8 +187,48 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                         stockQuantity: int.tryParse(stockQuantityController.text) ?? 0,
                       );
 
+                      // 1. احفظ المنتج في الداتابيز
                       widget.onSubmit(product);
-                      Navigator.pop(context);
+
+                      // 2. اسأل المدير: تطبع استيكرات؟ (بنعرض Dialog تأكيدي سريع)
+                      final bool? shouldPrint = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext dialogContext) {
+                          return AlertDialog(
+                            title: const Text("تم الحفظ بنجاح", textAlign: TextAlign.center),
+                            content: const Text(
+                              "هل تريد طباعة ملصقات الباركود (Stickers) لهذا المنتج؟",
+                              textAlign: TextAlign.center,
+                            ),
+                            actionsAlignment: MainAxisAlignment.spaceEvenly,
+                            actions: [
+                              TextButton(
+                                child: const Text("لا"),
+                                onPressed: () => Navigator.pop(dialogContext, false),
+                              ),
+                              ElevatedButton(
+                                child: const Text("نعم، اطبع"),
+                                onPressed: () => Navigator.pop(dialogContext, true),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                    
+                      if (shouldPrint == true) {
+                        await InvoicePrinter.printProductStickers(
+                          productName: product.name,
+                          productCode: product.code,
+                          sellingPrice: product.sellingPrice,
+                          quantity: product.stockQuantity, // بيطبع بعدد الكمية المتاحة
+                        );
+                      }
+
+                      // 4. نقفل الفورم الأساسية بعد ما نخلص خالص
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                   ),
                 ],

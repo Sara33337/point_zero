@@ -5,7 +5,10 @@ import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/utils/invoice_printer.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
+import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart';
+import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
 import 'package:point_zero/features/pos/domain/entities/bill_entity.dart';
+
 
 class BillContent extends StatelessWidget {
   final List<BillEntity> bills;
@@ -17,11 +20,11 @@ class BillContent extends StatelessWidget {
     if (bills.isEmpty) {
       return const Center(child: Text("لا توجد فواتير سابقة"));
     }
-
+    final reversedBills = bills.reversed.toList();
     return ListView.builder(
-      itemCount: bills.length,
+      itemCount: reversedBills.length,
       itemBuilder: (context, index) {
-        final bill = bills[index];
+        final bill = reversedBills[index];
         final formattedDate = DateFormat(
           'yyyy-MM-dd  hh:mm a',
         ).format(bill.createdAt);
@@ -41,6 +44,22 @@ class BillContent extends StatelessWidget {
                 children: [
                   Text("فاتورة #${bill.id}", style: AppStyles.largeTitle),
                   Text(formattedDate, style: AppStyles.smallTitle),
+                  Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                        decoration: BoxDecoration(
+                          // لو استبدال لونها برتقالي، لو بيع لونها أخضر
+                          color: bill.isExchange ? Colors.orange.shade100 : Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                        child: Text(
+                          bill.isExchange ? "استبدال" : "بيع",
+                          style: TextStyle(
+                            color: bill.isExchange ? Colors.orange.shade800 : Colors.green.shade800,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                 ],
               ),
 
@@ -87,7 +106,36 @@ class BillContent extends StatelessWidget {
                     child: PrimaryButton(
                       buttonText: "طباعة",
                       onTap: () async {
-                        await InvoicePrinter.printReceipt(bill);
+                        if (bill.isExchange && bill.returnedProductName != null) {
+                          // 1. حساب إجمالي البدائل
+                          double replacementTotal = 0;
+                          for (var item in bill.items) {
+                            replacementTotal += (item.unitPrice * item.quantity);
+                          }
+
+                          // 2. عمل كائن وهمي للمرتجع عشان نبعته لدالة الطباعة بتاعتك
+                          final dummyReturnedItem = PastSaleItemEntity(
+                            billId: 0,
+                            productCode: '',
+                            productName: bill.returnedProductName!,
+                            unitPrice: 0,
+                            quantity: bill.returnedQuantity!,
+                            createdAt: DateTime.now(),
+                          );
+
+                          // 3. طباعة إيصال الاستبدال كاملاً
+                          await InvoicePrinter.printExchangeReceipt(
+                            returnedItem: dummyReturnedItem,
+                            returnQuantity: bill.returnedQuantity!,
+                            replacementItems: bill.items.map((e) => e as CartItemModel).toList(),
+                            returnCredit: bill.returnCredit!,
+                            replacementTotal: replacementTotal,
+                            differencePaid: bill.totalAmount,
+                          );
+                        } else {
+                          // طباعة فاتورة بيع عادية
+                          await InvoicePrinter.printReceipt(bill);
+                        }
                       },
                     ),
                   ),

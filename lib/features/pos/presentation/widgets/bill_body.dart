@@ -100,6 +100,7 @@ class BillBody extends StatelessWidget {
                       items: List.from(state.cartItems),
                       totalAmount: state.totalAmount,
                       createdAt: DateTime.now(),
+                      isExchange: false,
                     );
 
                     context.read<PosCubit>().checkout();

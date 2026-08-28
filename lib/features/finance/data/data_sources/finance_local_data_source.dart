@@ -26,6 +26,7 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
     final db = await dbHelper.database;
     final String monthStr = month < 10 ? '0$month' : '$month';
     final String dateFilter = '$year-$monthStr%';
+  
 
     // 1. بنجيب الفواتير الأساسية الأول (من جدول bills)
     final List<Map<String, dynamic>> billMaps = await db.query(
@@ -53,12 +54,34 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
 
       final items = itemMaps.map((item) => CartItemModel.fromMap(item)).toList();
 
+      String? returnedName;
+      int? returnedQty;
+      double? returnCredit;
+
+      if (billMap['is_exchange'] == 1) {
+        final exchangeMaps = await db.query(
+          'exchanges',
+          where: 'new_bill_id = ?',
+          whereArgs: [billId],
+        );
+        
+        if (exchangeMaps.isNotEmpty) {
+          returnedName = exchangeMaps.first['old_product_name'] as String;
+          returnedQty = exchangeMaps.first['returned_qty'] as int;
+          returnCredit = (exchangeMaps.first['return_credit'] as num).toDouble();
+        }
+      }
+
       completeBills.add(
         BillModel(
           id: billId,
           totalAmount: (billMap['total_amount'] as num).toDouble(),
           createdAt: DateTime.parse(billMap['created_at']),
           items: items, 
+          isExchange: billMap['is_exchange'] == 1,
+          returnedProductName: returnedName,
+          returnedQuantity: returnedQty,
+          returnCredit: returnCredit,
         ),
       );
     }

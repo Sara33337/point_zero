@@ -12,21 +12,20 @@ class SalesScreenForCashier extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FinanceCubit, FinanceState>(
-      builder: (context, state) {
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.all(20.r),
-            child: Column(
-              children: [
-                Text("الفواتير السابقة", style: AppStyles.largeTitle),
-                SizedBox(height: 16.h),
+            builder: (context, state) {
+              return Padding(
+                padding: EdgeInsets.all(20.r),
+                child: Column(
+                  children: [
+                    Text("الفواتير السابقة", style: AppStyles.largeTitle),
+                    SizedBox(height: 16.h),
 
-                Expanded(child: BillContent(bills: state.bills)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+                    Expanded(child: BillContent(bills: state.bills)),
+                  ],
+                ),
+              );
+            },
+          );
+       
   }
 }

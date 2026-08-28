@@ -1,4 +1,4 @@
-import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
+
 
 // class PastSaleItemModel extends PastSaleItemEntity {
 //   const PastSaleItemModel({
@@ -22,8 +22,10 @@ import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
 //   }
 // }
 
+import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart';
+
 class PastSaleItemModel extends PastSaleItemEntity {
-  PastSaleItemModel({
+  const PastSaleItemModel({
     required super.billId,
     required super.productCode,
     required super.productName,

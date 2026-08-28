@@ -15,6 +15,28 @@ void showManagerLoginDialog(BuildContext context) {
     context: context,
     barrierDismissible: true,
     builder: (dialogContext) {
+      
+      void handleLogin() {
+        final password = passwordController.text.trim();
+
+        if (password == '1234') {
+          context.read<AuthCubit>().loginAsManager(password);
+          Navigator.pop(dialogContext);
+          context.go('/inventory_screen');
+        } else {
+          Navigator.pop(dialogContext);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'كلمة المرور غير صحيحة!',
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+
       return AlertDialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
@@ -31,11 +53,16 @@ void showManagerLoginDialog(BuildContext context) {
             Text("برجاء إدخال كلمة المرور:", style: AppStyles.smallTitle),
             SizedBox(height: 16.h),
             CustomTextFormField(
+              autofocus: true,
               controller: passwordController,
               obscureText: true,
               keyboardType: TextInputType.number,
               hintText: "****",
               textAlign: TextAlign.center,
+           
+              onFieldSubmitted: (value) {
+                handleLogin();
+              },
             ),
           ],
         ),
@@ -43,29 +70,9 @@ void showManagerLoginDialog(BuildContext context) {
         actions: [
           PrimaryButton(
             buttonText: "دخول",
-            onTap: () {
-              final password = passwordController.text.trim();
-
-              if (password == '1234') {
-                context.read<AuthCubit>().loginAsManager(password);
-                Navigator.pop(dialogContext);
-                context.go('/inventory_screen');
-              } else {
-                Navigator.pop(dialogContext); 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'كلمة المرور غير صحيحة!',
-                      textAlign: TextAlign.center,
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
+            onTap: handleLogin,
           ),
           const SizedBox(height: 4),
-
           SecondaryButton(
             buttonText: "إلغاء",
             onTap: () {

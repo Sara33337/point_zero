@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/theme/app_colors.dart';
 import 'package:point_zero/core/theme/app_styles.dart';
 import 'package:point_zero/core/widgets/custom_text_field.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_state.dart';
-import 'package:point_zero/features/pos/presentation/widgets/selected_exchange_item.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_cubit.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_state.dart';
+import 'package:point_zero/features/exchange/presentation/widgets/selected_exchange_item.dart';
 
 class ReplacementSection extends StatelessWidget {
   const ReplacementSection({super.key});

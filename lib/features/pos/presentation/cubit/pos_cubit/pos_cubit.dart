@@ -142,6 +142,7 @@ class PosCubit extends Cubit<PosState> {
       items: state.cartItems,
       totalAmount: state.totalAmount,
       createdAt: DateTime.now(),
+      isExchange: false,
     );
 
     final result = await checkoutUseCase(bill);

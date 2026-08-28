@@ -56,7 +56,8 @@ class DatabaseHelper {
       CREATE TABLE bills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         total_amount REAL NOT NULL,
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        is_exchange INTEGER DEFAULT 0
       )
     ''');
 
@@ -95,9 +96,11 @@ class DatabaseHelper {
   CREATE TABLE exchanges (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     old_bill_id INTEGER NOT NULL,
+    new_bill_id INTEGER NOT NULL,
     old_product_code TEXT NOT NULL,
     old_product_name TEXT NOT NULL,
     returned_qty INTEGER NOT NULL,
+    return_credit REAL NOT NULL,
     
     -- إجمالي الفلوس اللي العميل دفعها كفرق (ممكن تكون صفر)
     difference_paid REAL NOT NULL, 

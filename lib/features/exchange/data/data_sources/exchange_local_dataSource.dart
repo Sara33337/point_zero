@@ -1,8 +1,10 @@
 import 'package:point_zero/core/data/db_helper.dart';
+import 'package:point_zero/features/exchange/data/models/past_sale_model.dart';
+import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart';
 import 'package:point_zero/features/inventory/data/models/product_model.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
-import 'package:point_zero/features/pos/data/models/past_sale_model.dart';
-import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
+
+
 
 abstract class ExchangeLocalDatasource {
   Future<List<PastSaleItemModel>> searchPastSales(String query);
@@ -45,8 +47,9 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
   }
 
   @override
+  @override
   Future<void> processExchangeTransaction({
-    required PastSaleItemEntity returnedItem, // 👈 التعديل هنا
+    required PastSaleItemEntity returnedItem, 
     required List<CartItemModel> replacementItems,
     required double differencePaid,
   }) async {
@@ -60,7 +63,6 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
       SET stock_quantity = stock_quantity + ? 
       WHERE code = ?
       ''',
-        // 👈 استخدمنا . بدل ['']
         [returnedItem.quantity, returnedItem.productCode],
       );
 
@@ -76,35 +78,37 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
         );
       }
 
-      // 3. توثيق العملية في جدول الاستبدالات
+      // 3. نكريت الفاتورة الجديدة الأول عشان ناخد الـ ID بتاعها
+      int newBillId = await txn.insert('bills', {
+        'total_amount': differencePaid,
+        'created_at': DateTime.now().toIso8601String(),
+        'is_exchange': 1,
+      });
+
+      // 4. نضيف المنتجات البديلة للفاتورة الجديدة
+      for (var item in replacementItems) {
+        await txn.insert('bill_items', {
+          'bill_id': newBillId,
+          'product_code': item.product.code,
+          'product_name': item.product.name,
+          'quantity': item.quantity,
+          'wholesale_price': item.product.wholesalePrice,
+          'unit_price': item.unitPrice,
+          'subtotal': item.subtotal,
+        });
+      }
+
       await txn.insert('exchanges', {
-        'old_bill_id': returnedItem.billId,           // 👈 التعديل هنا
-        'old_product_code': returnedItem.productCode, // 👈 التعديل هنا
-        'old_product_name': returnedItem.productName, // 👈 التعديل هنا
-        'returned_qty': returnedItem.quantity,        // 👈 التعديل هنا
+        'old_bill_id': returnedItem.billId,
+        'new_bill_id': newBillId, // 👈 الربط حصل هنا بنجاح
+        'old_product_code': returnedItem.productCode,
+        'old_product_name': returnedItem.productName,
+        'returned_qty': returnedItem.quantity,
+        'return_credit': returnedItem.unitPrice * returnedItem.quantity, // 👈 ضفنا فلوس المرتجع هنا
         'difference_paid': differencePaid,
         'created_at': DateTime.now().toIso8601String(),
       });
-
-      // 4. لو العميل دفع فرق (فاتورة جديدة)
-      if (differencePaid > 0) {
-        int newBillId = await txn.insert('bills', {
-          'total_amount': differencePaid,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-
-        for (var item in replacementItems) {
-          await txn.insert('bill_items', {
-            'bill_id': newBillId,
-            'product_code': item.product.code,
-            'product_name': item.product.name,
-            'quantity': item.quantity,
-            'wholesale_price': item.product.wholesalePrice,
-            'unit_price': item.unitPrice,
-            'subtotal': item.subtotal,
-          });
-        }
-      }
+      
     });
   }
   

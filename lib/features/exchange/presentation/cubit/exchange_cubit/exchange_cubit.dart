@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
-import 'package:point_zero/features/pos/domain/entities/past_sale_item.dart';
-import 'package:point_zero/features/pos/domain/useCases/process_exchange_useCase.dart';
-import 'package:point_zero/features/pos/domain/useCases/search_past_sale_useCase.dart';
+
+import 'package:point_zero/features/exchange/domain/use_cases/process_exchange_useCase.dart';
+import 'package:point_zero/features/exchange/domain/use_cases/search_past_sale_useCase.dart';
 import 'package:point_zero/features/pos/domain/useCases/search_products_useCase.dart';
 
 import 'exchange_state.dart';
@@ -91,37 +92,41 @@ class ExchangeCubit extends Cubit<ExchangeState> {
   // add replacement item to cart
   void addReplacementItem(ProductEntity product) {
     final updatedList = List<CartItemModel>.from(state.replacementItems);
+    final existingIndex = updatedList.indexWhere((element) => element.product.code == product.code);
 
-    final existingIndex = updatedList.indexWhere(
-      (element) => element.product.code == product.code,
-    );
-    
     if (existingIndex >= 0) {
-      // لو المنتج موجود أصلاً في السلة البديلة، بنزود الكمية بتاعته
       final oldItem = updatedList[existingIndex];
-      updatedList[existingIndex] = CartItemModel(
-        product: oldItem.product,
-        quantity: oldItem.quantity + 1,
-        unitPrice: oldItem.unitPrice,
-      );
+      // 👈 التحقق من المخزن هنا
+      if (oldItem.quantity < product.stockQuantity) {
+        updatedList[existingIndex] = CartItemModel(
+          product: oldItem.product,
+          quantity: oldItem.quantity + 1,
+          unitPrice: oldItem.unitPrice,
+        );
+      } else {
+        emit(state.copyWith(errorMessage: 'الكمية المطلوبة غير متوفرة في المخزن'));
+        // تفريغ رسالة الخطأ فوراً عشان متثبتش
+        emit(state.copyWith(errorMessage: null));
+        return;
+      }
     } else {
-      // لو منتج جديد، بنحوله لـ CartItemModel ونضيفه بكمية 1
-      updatedList.add(
-        CartItemModel(
-          product: product,
-          quantity: 1,
-          unitPrice: product.sellingPrice, // تأكدي إن اسم المتغير sellingPrice أو price حسب الـ Entity بتاعتك
-        )
-      );
+      // 👈 التحقق للمنتج الجديد
+      if (product.stockQuantity > 0) {
+        updatedList.add(
+          CartItemModel(
+            product: product,
+            quantity: 1,
+            unitPrice: product.sellingPrice,
+          )
+        );
+      } else {
+        emit(state.copyWith(errorMessage: 'هذا المنتج نافذ من المخزن'));
+        emit(state.copyWith(errorMessage: null));
+        return;
+      }
     }
 
-    emit(
-      state.copyWith(
-        replacementItems: updatedList,
-        // تصفير البحث عشان الشاشة ترجع فاضية وجاهزة لبحث جديد
-        replacementSearchResults: [], 
-      ),
-    );
+    emit(state.copyWith(replacementItems: updatedList, replacementSearchResults: []));
     _calculateTotals();
   }
 

@@ -6,7 +6,7 @@ import 'package:point_zero/features/finance/presentation/finance_cubit/finance_c
 import 'package:point_zero/features/finance/presentation/screens/finance_screen.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
 import 'package:point_zero/features/inventory/presentation/screens/inventory_screen.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_cubit.dart';
 import 'package:point_zero/features/pos/presentation/cubit/pos_cubit/pos_cubit.dart';
 import 'package:point_zero/features/pos/presentation/screens/pos_screen.dart';
 import 'package:point_zero/features/pos/presentation/screens/sales_screen.dart';

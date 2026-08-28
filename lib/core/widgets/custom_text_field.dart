@@ -9,11 +9,14 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextAlign textAlign;
   final bool obscureText;
+  final bool autofocus;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final bool readOnly;
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
 
   const CustomTextFormField({
     super.key,
@@ -24,11 +27,14 @@ class CustomTextFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textAlign = TextAlign.start,
     this.obscureText = false,
+    this.autofocus = false,
     this.prefixIcon,
+    this.focusNode,
     this.suffixIcon,
     this.validator,
     this.onChanged,
     this.readOnly = false,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -44,6 +50,9 @@ class CustomTextFormField extends StatelessWidget {
           validator: validator,
           onChanged: onChanged,
           textAlign: textAlign,
+          onFieldSubmitted: onFieldSubmitted,
+          autofocus: autofocus,
+          focusNode: focusNode ,
         
           decoration: InputDecoration(
             hintText: hintText,

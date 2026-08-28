@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:point_zero/core/widgets/primary_button.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_cubit.dart';
-import 'package:point_zero/features/pos/presentation/cubit/exchange_cubit/exchange_state.dart';
-import 'package:point_zero/features/pos/presentation/widgets/total_block.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_cubit.dart';
+import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_state.dart';
+import 'package:point_zero/features/exchange/presentation/widgets/total_block.dart';
 
 
 class ExchangeBottomBar extends StatelessWidget {
