@@ -107,5 +107,19 @@ class DatabaseHelper {
     created_at TEXT NOT NULL
   )
 ''');
+
+    // 7. جدول الإعدادات والتفعيل (لحماية التطبيق)
+    await db.execute('''
+      CREATE TABLE app_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        is_activated INTEGER DEFAULT 0,
+        license_key TEXT
+      )
+    ''');
+
+    // إدخال صف افتراضي غير مفعل عند إنشاء الداتابيز لأول مرة
+    await db.execute('''
+      INSERT INTO app_settings (is_activated, license_key) VALUES (0, '')
+    ''');
   }
 }

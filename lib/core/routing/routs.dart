@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:point_zero/core/widgets/main_layout.dart';
+import 'package:point_zero/features/activation/presentation/screens/activation_screen.dart';
 import 'package:point_zero/features/finance/presentation/finance_cubit/finance_cubit.dart';
 import 'package:point_zero/features/finance/presentation/screens/finance_screen.dart';
 import 'package:point_zero/features/inventory/presentation/inventory_cubit/inventory_cubit.dart';
@@ -12,57 +13,67 @@ import 'package:point_zero/features/pos/presentation/screens/pos_screen.dart';
 import 'package:point_zero/features/pos/presentation/screens/sales_screen.dart';
 import 'package:point_zero/injection_container.dart' as di;
 
-final GoRouter router = GoRouter(
-  initialLocation: '/',
-  routes: [
-    ShellRoute(
-      builder: (context, state, child) {
-        return MainLayout(child: child);
-      },
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (BuildContext context, GoRouterState state) {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider(create: (_) => di.sl<PosCubit>()..loadProducts()),
-                BlocProvider(create: (_) => di.sl<ExchangeCubit>()),
-              ],
-              child: const PosScreen(),
-            );
-          },
-        ),
+GoRouter appRouter(bool isActivated) {
+  return GoRouter(
+    initialLocation: isActivated ? '/' : '/activation',
+    routes: [
 
-        GoRoute(
-          path: '/sales_screen',
-          builder: (BuildContext context, GoRouterState state) {
-            return BlocProvider(
-              create: (_) => di.sl<FinanceCubit>()..loadMonthlyData(),
-              child: SalesScreenForCashier(),
-            );
-          },
-        ),
+      GoRoute(
+        path: '/activation',
+        builder: (BuildContext context, GoRouterState state) {
+      
+          return const ActivationScreen();
+         
+        },
+      ),
 
-        GoRoute(
-          path: '/finance_screen',
-          builder: (BuildContext context, GoRouterState state) {
-            return BlocProvider(
-              create: (_) => di.sl<FinanceCubit>()..loadMonthlyData(),
-              child: FinanceScreen(),
-            );
-          },
-        ),
-
-        GoRoute(
-          path: '/inventory_screen',
-          builder: (BuildContext context, GoRouterState state) {
-            return BlocProvider(
-              create: (_) => di.sl<InventoryCubit>()..loadProducts(),
-              child: InventoryScreen(),
-            );
-          },
-        ),
-      ],
-    ),
-  ],
-);
+    
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainLayout(child: child);
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (BuildContext context, GoRouterState state) {
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (_) => di.sl<PosCubit>()..loadProducts()),
+                  BlocProvider(create: (_) => di.sl<ExchangeCubit>()),
+                ],
+                child: const PosScreen(),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/sales_screen',
+            builder: (BuildContext context, GoRouterState state) {
+              return BlocProvider(
+                create: (_) => di.sl<FinanceCubit>()..loadMonthlyData(),
+                child: SalesScreenForCashier(),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/finance_screen',
+            builder: (BuildContext context, GoRouterState state) {
+              return BlocProvider(
+                create: (_) => di.sl<FinanceCubit>()..loadMonthlyData(),
+                child: FinanceScreen(),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/inventory_screen',
+            builder: (BuildContext context, GoRouterState state) {
+              return BlocProvider(
+                create: (_) => di.sl<InventoryCubit>()..loadProducts(),
+                child: InventoryScreen(),
+              );
+            },
+          ),
+        ],
+      ),
+    ],
+  );
+}
