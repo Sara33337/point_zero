@@ -55,6 +55,15 @@ class SideBar extends StatelessWidget {
                       context.go('/finance_screen');
                     },
                   ),
+                  // Category(
+                  //   isSelected: currentPath == '/settings_screen',
+                  //   categoryName: "الإعدادات والطابعات",
+                  //   icon: AppIcons
+                  //       .editIcon, // أو الأيقونة الخاصة بيكِ AppIcons.settingsIcon
+                  //   onTap: () {
+                  //     context.go('/settings_screen');
+                  //   },
+                  // ),
                 ],
 
                 if (currentRole == "cashier") ...[

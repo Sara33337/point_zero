@@ -11,6 +11,7 @@ import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/e
 import 'package:point_zero/features/pos/presentation/cubit/pos_cubit/pos_cubit.dart';
 import 'package:point_zero/features/pos/presentation/screens/pos_screen.dart';
 import 'package:point_zero/features/pos/presentation/screens/sales_screen.dart';
+import 'package:point_zero/features/settings/presentation/setting_screen.dart';
 import 'package:point_zero/injection_container.dart' as di;
 
 GoRouter appRouter(bool isActivated) {
@@ -72,6 +73,12 @@ GoRouter appRouter(bool isActivated) {
               );
             },
           ),
+          GoRoute(
+  path: '/settings_screen',
+  builder: (BuildContext context, GoRouterState state) {
+    return const SettingsScreen(); 
+  },
+),
         ],
       ),
     ],
