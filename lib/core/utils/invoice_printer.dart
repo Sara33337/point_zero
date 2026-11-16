@@ -132,9 +132,9 @@ class InvoicePrinter {
     final fontData = await rootBundle.load('assets/fonts/Tajawal-Regular.ttf');
     final arabicFont = pw.Font.ttf(fontData);
 
-    final double stickerWidth = 50 * 2.83;
-    final double stickerHeight = 30 * 2.83;
-    final margin = 2 * 2.83;
+    final double stickerWidth = 38 * 2.83;
+    final double stickerHeight = 25 * 2.83;
+    final margin = 1.5 * 2.83;
 
     final stickerFormat = PdfPageFormat(
       stickerWidth,
