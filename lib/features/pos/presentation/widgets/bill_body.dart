@@ -95,6 +95,21 @@ class BillBody extends StatelessWidget {
                       return;
                     }
 
+                    for (var item in state.cartItems) {
+                 
+                      if (item.unitPrice < item.product.wholesalePrice) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "خطأ: سعر بيع المنتج (${item.product.name}) أقل من سعر الجملة!",
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return; // نوقف عملية الدفع فوراً
+                      }
+                    }
+
                     final currentBill = BillEntity(
                       id: DateTime.now().millisecondsSinceEpoch,
                       items: List.from(state.cartItems),

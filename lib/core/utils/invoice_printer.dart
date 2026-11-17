@@ -91,7 +91,7 @@ class InvoicePrinter {
                   ),
                 )
                 .toList(),
-            pw.Divider(),
+            pw.Divider(borderStyle: pw.BorderStyle.dashed),
             _buildItemRow('إجمالي البدائل:', '$replacementTotal', fonts),
             _buildItemRow('يُخصم رصيد المرتجع:', '$returnCredit', fonts),
             pw.SizedBox(height: 4),
@@ -107,7 +107,7 @@ class InvoicePrinter {
                 fonts,
               ),
             ),
-            pw.Divider(),
+            pw.Divider(borderStyle: pw.BorderStyle.dashed),
             _buildFooter(fonts),
           ],
         ),
@@ -134,7 +134,7 @@ class InvoicePrinter {
 
     final double stickerWidth = 38 * 2.83;
     final double stickerHeight = 25 * 2.83;
-    final margin = 1.5 * 2.83;
+    final margin = 0.5 * 2.83;
 
     final stickerFormat = PdfPageFormat(
       stickerWidth,
@@ -176,16 +176,16 @@ class InvoicePrinter {
                   pw.SizedBox(height: 2),
 
                   pw.SizedBox(
-                    height: 35,
+                    height: 24,
                     width: double.infinity,
                     child: pw.BarcodeWidget(
                       barcode: pw.Barcode.code128(),
-                      data: productCode,
+                      data: productCode.isNotEmpty ? productCode : '123456',
                       drawText: true,
 
                       textStyle: pw.TextStyle(
                         font: arabicFont,
-                        fontSize: 10,
+                        fontSize: 7,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
@@ -439,32 +439,36 @@ class InvoicePrinter {
           _poweredBy,
           style: pw.TextStyle(
             fontSize: 8,
-            color: PdfColors.grey,
-            font: fonts['regular'],
+            color: PdfColors.grey900,
+            fontWeight: pw.FontWeight.bold,
+            font: fonts['bold'],
           ),
         ),
         pw.Text(
           _address,
           style: pw.TextStyle(
             fontSize: 8,
-            color: PdfColors.grey,
-            font: fonts['regular'],
+            color: PdfColors.grey900,
+            fontWeight: pw.FontWeight.bold,
+            font: fonts['bold'],
           ),
         ),
         pw.Text(
           _phone,
           style: pw.TextStyle(
             fontSize: 8,
-            color: PdfColors.grey,
-            font: fonts['regular'],
+            color: PdfColors.grey900,
+            fontWeight: pw.FontWeight.bold,
+            font: fonts['bold'],
           ),
         ),
         pw.Text(
           _policy,
           style: pw.TextStyle(
             fontSize: 8,
-            color: PdfColors.grey,
-            font: fonts['regular'],
+            color: PdfColors.grey900,
+            fontWeight: pw.FontWeight.bold,
+            font: fonts['bold'],
           ),
         ),
       ],
@@ -491,8 +495,11 @@ class InvoicePrinter {
   }) {
     return pw.Page(
       // pageFormat: PdfPageFormat.roll80,
-      pageFormat: const PdfPageFormat(80 * PdfPageFormat.mm, 1000 * PdfPageFormat.mm),
-      margin: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      pageFormat: const PdfPageFormat(
+        80 * PdfPageFormat.mm,
+        1000 * PdfPageFormat.mm,
+      ),
+      margin: const pw.EdgeInsets.symmetric(horizontal: 0, vertical: 4),
       textDirection: pw.TextDirection.rtl,
       theme: pw.ThemeData.withFont(base: fonts['regular'], bold: fonts['bold']),
       build: buildContent,

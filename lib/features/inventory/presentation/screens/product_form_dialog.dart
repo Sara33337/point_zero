@@ -148,7 +148,13 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) return "أدخل سعر البيع";
-                      if (double.tryParse(value) == null) return "أدخل رقم صحيح";
+                      final sellingPrice = double.tryParse(value);
+                      final wholesalePrice = double.tryParse(wholesalePriceController.text);
+                      if (sellingPrice == null) return "أدخل رقم صحيح";
+                    
+                      if (wholesalePrice != null && sellingPrice <= wholesalePrice) {
+                        return "سعر البيع يجب أن يكون أكبر من سعر الجملة";
+                      }
                       return null;
                     },
                   ),

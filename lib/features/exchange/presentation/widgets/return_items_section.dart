@@ -7,9 +7,28 @@ import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/e
 import 'package:point_zero/features/exchange/presentation/cubit/exchange_cubit/exchange_state.dart';
 import 'package:point_zero/features/exchange/presentation/widgets/return_item.dart';
 
-class ReturnItemsSection extends StatelessWidget {
+class ReturnItemsSection extends StatefulWidget {
   const ReturnItemsSection({super.key});
 
+  @override
+  State<ReturnItemsSection> createState() => _ReturnItemsSectionState();
+}
+
+class _ReturnItemsSectionState extends State<ReturnItemsSection> {
+  late FocusNode _searchFocusNode;
+  @override
+  void initState() {
+    super.initState();
+    _searchFocusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchFocusNode.requestFocus();
+    });
+  }
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExchangeCubit, ExchangeState>(
@@ -22,6 +41,7 @@ class ReturnItemsSection extends StatelessWidget {
             CustomTextFormField(
               hintText: "ابحث بكود المنتج...",
               prefixIcon: const Icon(Icons.search),
+              focusNode: _searchFocusNode,
               onChanged: (value) {
                 context.read<ExchangeCubit>().searchPastBills(value);
               },

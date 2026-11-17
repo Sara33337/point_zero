@@ -3,7 +3,7 @@ import 'package:crypto/crypto.dart';
 
 void main() {
   // كود الجهاز الذي ظهر لك
-  String deviceId = "{422AF93A-EF07-463C-801B-8220389D7B39}";
+  String deviceId = "{9CDF414C-FFD1-4A75-9D13-38DCA3A8FD39}";
   
   // كلمة السر الثابتة لديك
   String secretSalt = "SARAH_POINT_ZERO_2026_SECURE";
