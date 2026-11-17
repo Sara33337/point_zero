@@ -156,7 +156,7 @@ class InvoicePrinter {
                     productName,
                     style: pw.TextStyle(
                       font: arabicFont,
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: pw.FontWeight.bold,
                     ),
                     maxLines: 1,
@@ -496,10 +496,13 @@ class InvoicePrinter {
     return pw.Page(
       // pageFormat: PdfPageFormat.roll80,
       pageFormat: const PdfPageFormat(
-        80 * PdfPageFormat.mm,
+        72 * PdfPageFormat.mm,
         1000 * PdfPageFormat.mm,
       ),
-      margin: const pw.EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      margin: const pw.EdgeInsets.symmetric(
+        horizontal: 4 * PdfPageFormat.mm,
+        vertical: 4 * PdfPageFormat.mm,
+      ),
       textDirection: pw.TextDirection.rtl,
       theme: pw.ThemeData.withFont(base: fonts['regular'], bold: fonts['bold']),
       build: buildContent,
