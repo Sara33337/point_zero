@@ -27,6 +27,7 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
     final String monthStr = month < 10 ? '0$month' : '$month';
     final String dateFilter = '$year-$monthStr%';
   
+  
 
     // 1. بنجيب الفواتير الأساسية الأول (من جدول bills)
     final List<Map<String, dynamic>> billMaps = await db.query(
@@ -57,18 +58,30 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
       String? returnedName;
       int? returnedQty;
       double? returnCredit;
+      double? returnedWholesale;
 
       if (billMap['is_exchange'] == 1) {
-        final exchangeMaps = await db.query(
-          'exchanges',
-          where: 'new_bill_id = ?',
-          whereArgs: [billId],
+        final exchangeMaps = await db.rawQuery(
+          '''
+          SELECT 
+            e.old_product_name,
+            e.returned_qty,
+            e.return_credit,
+            p.wholesale_price AS old_wholesale_price
+          FROM exchanges e
+          LEFT JOIN products p ON e.old_product_code = p.code
+          WHERE e.new_bill_id = ?
+          ''',
+          [billId],
         );
         
         if (exchangeMaps.isNotEmpty) {
           returnedName = exchangeMaps.first['old_product_name'] as String;
           returnedQty = exchangeMaps.first['returned_qty'] as int;
           returnCredit = (exchangeMaps.first['return_credit'] as num).toDouble();
+          final oldWholesale =
+              (exchangeMaps.first['old_wholesale_price'] as num?)?.toDouble() ?? 0.0;
+          returnedWholesale = oldWholesale * returnedQty;
         }
       }
 
@@ -82,6 +95,7 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
           returnedProductName: returnedName,
           returnedQuantity: returnedQty,
           returnCredit: returnCredit,
+          returnedWholesaleCost: returnedWholesale,
         ),
       );
     }

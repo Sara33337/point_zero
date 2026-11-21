@@ -26,20 +26,22 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
   }
 
   void _submitExpense() {
-    // 1. تصليح قراءة اسم المصروف
     final expenseName = expenseNameController.text.trim();
-    final expenseAmount = double.tryParse(expenseAmountController.text) ?? 0;
+    final expenseAmount =
+        double.tryParse(expenseAmountController.text.trim()) ?? 0;
 
-    if (expenseName.isNotEmpty && expenseAmount > 0) {
-      // 2. تصليح طريقة استدعاء الـ read
-      context.read<FinanceCubit>().addExpense(expenseName, expenseAmount);
-      
-      // 3. تفريغ الحقلين بشكل صحيح
-      expenseNameController.clear();
-      expenseAmountController.clear();
-
-      FocusScope.of(context).unfocus();
+    if (expenseName.isEmpty || expenseAmount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("من فضلك أدخل اسم المصروف ومبلغاً صحيحاً")),
+      );
+      return;
     }
+
+    context.read<FinanceCubit>().addExpense(expenseName, expenseAmount);
+
+    expenseNameController.clear();
+    expenseAmountController.clear();
+    FocusScope.of(context).unfocus();
   }
 
   @override

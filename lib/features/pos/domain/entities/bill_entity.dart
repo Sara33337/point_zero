@@ -10,6 +10,7 @@ class BillEntity extends Equatable {
   final String? returnedProductName;
   final int? returnedQuantity;
   final double? returnCredit;
+  final double? returnedWholesaleCost;
 
   const BillEntity({
     this.id,
@@ -20,6 +21,7 @@ class BillEntity extends Equatable {
     this.returnedProductName,
     this.returnedQuantity,
     this.returnCredit,
+    this.returnedWholesaleCost,
   });
   @override
   List<Object?> get props => [
@@ -31,5 +33,6 @@ class BillEntity extends Equatable {
     returnedProductName,
     returnCredit,
     returnedQuantity,
+    returnedWholesaleCost,
   ];
 }

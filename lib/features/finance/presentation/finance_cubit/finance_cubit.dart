@@ -31,6 +31,7 @@ class FinanceCubit extends Cubit<FinanceState> {
       ),
     );
 
+    // بنجيب الداتا من الداتابيز
     final salesResult = await getMonthlySalesUseCase(targetMonth, targetYear);
     final expensesResult = await getMonthlyExpensesUseCase(
       targetMonth,
@@ -48,18 +49,39 @@ class FinanceCubit extends Cubit<FinanceState> {
             state.copyWith(status: FinanceStatus.error, error: failure.message),
           ),
           (expenses) {
-            double revenue = 0.0;
+            // 1. إجمالي المبيعات (مجموع الفواتير كما هي)
+            double grossSales = 0.0;
+            // 2. إجمالي تكلفة الجملة للبضاعة المباعة
+            double totalWholesaleCost = 0.0;
+
             for (var bill in bills) {
-              revenue += bill.totalAmount;
+              grossSales += bill.totalAmount;
+
+              for (var item in bill.items) {
+                totalWholesaleCost += (item.product.wholesalePrice * item.quantity);
+              }
+
+              if (bill.isExchange && bill.returnedWholesaleCost != null) {
+                totalWholesaleCost -= bill.returnedWholesaleCost!;
+              }
             }
-          
+
+            // 3. إجمالي المصروفات
             double totalExp = 0.0;
             for (var expense in expenses) {
               totalExp += expense.expenseAmount;
             }
 
-            double profit = revenue - totalExp;
-         
+            // 4. القيم النهائية:
+            // إجمالي الإيرادات = مجموع أسعار البيع بدون خصم المصروفات
+            double revenue = grossSales;
+
+            // مكسب البضاعة = المبيعات - تكلفة الجملة
+            double grossProfit = grossSales - totalWholesaleCost;
+
+            // صافي الربح = مكسب البضاعة - إجمالي المصروفات
+            double profit = grossProfit - totalExp;
+
             emit(
               state.copyWith(
                 status: FinanceStatus.loaded,
@@ -78,7 +100,7 @@ class FinanceCubit extends Cubit<FinanceState> {
     );
   }
 
-
+  // 2. دالة إضافة مصروف جديد
   Future<void> addExpense(String name, double amount) async {
     final expense = ExpenseEntity(
       expenseAmount: amount,
@@ -102,6 +124,4 @@ class FinanceCubit extends Cubit<FinanceState> {
   void changeMonth(int month, int year) {
     loadMonthlyData(month: month, year: year);
   }
-
-  
 }

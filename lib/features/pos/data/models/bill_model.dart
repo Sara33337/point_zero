@@ -9,7 +9,8 @@ class BillModel extends BillEntity {
     required super.isExchange,
     super.returnCredit,
     super.returnedProductName,
-    super.returnedQuantity
+    super.returnedQuantity,
+    super.returnedWholesaleCost,
   });
 
   factory BillModel.fromEntity(BillEntity billEntity) {
@@ -21,20 +22,22 @@ class BillModel extends BillEntity {
       isExchange: billEntity.isExchange,
       returnCredit: billEntity.returnCredit,
       returnedProductName: billEntity.returnedProductName,
-      returnedQuantity: billEntity.returnedQuantity
+      returnedQuantity: billEntity.returnedQuantity,
+      returnedWholesaleCost: billEntity.returnedWholesaleCost
     );
   }
 
   factory BillModel.fromMap(Map<String, dynamic> map) {
     return BillModel(
       id: map['id'],
-      totalAmount: map['total_amount'],
+      totalAmount: (map['total_amount'] as num).toDouble(),
       createdAt: DateTime.parse(map['created_at']),
       isExchange: map['is_exchange'] == 1, 
       items: const [],
       returnedProductName: map['returned_product_name'],
       returnedQuantity: map['returned_quantity'],
-      returnCredit: map['return_credit'],
+      returnCredit: map['return_credit'] != null ? (map['return_credit'] as num).toDouble() : null,
+      returnedWholesaleCost: map['returned_wholesale_cost'] != null ? (map['returned_wholesale_cost'] as num).toDouble() : null,
     );
   }
 
