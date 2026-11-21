@@ -3,11 +3,19 @@ import 'package:point_zero/core/data/db_helper.dart';
 import 'package:point_zero/features/finance/data/models/expense_model.dart';
 import 'package:point_zero/features/pos/data/models/bill_model.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 abstract class FinanceLocalDataSource {
   Future<Unit> addExpense(ExpenseModel expense);
   Future<List<ExpenseModel>> getExpenseByMonth(int month, int year);
   Future<List<BillModel>> getBillsByMonth(int month, int year);
+  Future<Unit> deleteBillItem(int billItemId, int billId);
+  Future<Unit> updateBillItem(
+    int billItemId,
+    int billId,
+    int newQuantity,
+    double newUnitPrice,
+  );
 }
 
 class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
@@ -26,8 +34,6 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
     final db = await dbHelper.database;
     final String monthStr = month < 10 ? '0$month' : '$month';
     final String dateFilter = '$year-$monthStr%';
-  
-  
 
     // 1. بنجيب الفواتير الأساسية الأول (من جدول bills)
     final List<Map<String, dynamic>> billMaps = await db.query(
@@ -53,7 +59,9 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
         [billId],
       );
 
-      final items = itemMaps.map((item) => CartItemModel.fromMap(item)).toList();
+      final items = itemMaps
+          .map((item) => CartItemModel.fromMap(item))
+          .toList();
 
       String? returnedName;
       int? returnedQty;
@@ -74,13 +82,15 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
           ''',
           [billId],
         );
-        
+
         if (exchangeMaps.isNotEmpty) {
           returnedName = exchangeMaps.first['old_product_name'] as String;
           returnedQty = exchangeMaps.first['returned_qty'] as int;
-          returnCredit = (exchangeMaps.first['return_credit'] as num).toDouble();
+          returnCredit = (exchangeMaps.first['return_credit'] as num)
+              .toDouble();
           final oldWholesale =
-              (exchangeMaps.first['old_wholesale_price'] as num?)?.toDouble() ?? 0.0;
+              (exchangeMaps.first['old_wholesale_price'] as num?)?.toDouble() ??
+              0.0;
           returnedWholesale = oldWholesale * returnedQty;
         }
       }
@@ -90,7 +100,7 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
           id: billId,
           totalAmount: (billMap['total_amount'] as num).toDouble(),
           createdAt: DateTime.parse(billMap['created_at']),
-          items: items, 
+          items: items,
           isExchange: billMap['is_exchange'] == 1,
           returnedProductName: returnedName,
           returnedQuantity: returnedQty,
@@ -115,5 +125,106 @@ class FinancrLocalDataSourceImpl implements FinanceLocalDataSource {
     );
 
     return maps.map((map) => ExpenseModel.fromMap(map)).toList();
+  }
+
+
+ @override
+  Future<Unit> deleteBillItem(int billItemId, int billId) async {
+    final db = await dbHelper.database;
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'bill_items',
+        columns: ['product_code', 'quantity'],
+        where: 'id = ?',
+        whereArgs: [billItemId],
+      );
+
+      if (rows.isNotEmpty) {
+        final String productCode = rows.first['product_code'] as String;
+        final int oldQty = rows.first['quantity'] as int;
+
+        await txn.rawUpdate(
+          '''
+          UPDATE products
+          SET stock_quantity = stock_quantity + ?
+          WHERE code = ?
+          ''',
+          [oldQty, productCode],
+        );
+      }
+
+      await txn.delete('bill_items', where: 'id = ?', whereArgs: [billItemId]);
+      await _recalculateBillTotal(txn, billId);
+    });
+    return unit;
+  }
+
+  @override
+  Future<Unit> updateBillItem(
+    int billItemId,
+    int billId,
+    int newQuantity,
+    double newUnitPrice,
+  ) async {
+    final db = await dbHelper.database;
+    final double newSubtotal = newQuantity * newUnitPrice;
+
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'bill_items',
+        columns: ['product_code', 'quantity'],
+        where: 'id = ?',
+        whereArgs: [billItemId],
+      );
+
+      if (rows.isNotEmpty) {
+        final String productCode = rows.first['product_code'] as String;
+        final int oldQty = rows.first['quantity'] as int;
+        final int qtyDiff = newQuantity - oldQty;
+
+        if (qtyDiff != 0) {
+          await txn.rawUpdate(
+            '''
+            UPDATE products
+            SET stock_quantity = stock_quantity - ?
+            WHERE code = ?
+            ''',
+            [qtyDiff, productCode],
+          );
+        }
+      }
+
+      await txn.update(
+        'bill_items',
+        {
+          'quantity': newQuantity,
+          'unit_price': newUnitPrice,
+          'subtotal': newSubtotal,
+        },
+        where: 'id = ?',
+        whereArgs: [billItemId],
+      );
+      await _recalculateBillTotal(txn, billId);
+    });
+    return unit;
+  }
+
+  Future<void> _recalculateBillTotal(DatabaseExecutor db, int billId) async {
+    final res = await db.rawQuery(
+      'SELECT COALESCE(SUM(subtotal), 0) AS total FROM bill_items WHERE bill_id = ?',
+      [billId],
+    );
+    final newTotal = (res.first['total'] as num?)?.toDouble() ?? 0.0;
+
+    if (newTotal <= 0) {
+      await db.delete('bills', where: 'id = ?', whereArgs: [billId]);
+    } else {
+      await db.update(
+        'bills',
+        {'total_amount': newTotal},
+        where: 'id = ?',
+        whereArgs: [billId],
+      );
+    }
   }
 }

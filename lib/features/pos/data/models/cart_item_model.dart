@@ -6,10 +6,12 @@ class CartItemModel extends CartItemEntity {
     required super.product,
     required super.quantity,
     required super.unitPrice,
+    super.billItemId,
   });
 
   factory CartItemModel.fromEntity(CartItemEntity cartItem){
    return CartItemModel(
+    billItemId: cartItem.billItemId,
       product: cartItem.product,
       quantity: cartItem.quantity,
       unitPrice: cartItem.unitPrice,
@@ -18,7 +20,9 @@ class CartItemModel extends CartItemEntity {
 
   factory CartItemModel.fromMap(Map<String, dynamic> map) {
   return CartItemModel(
+    billItemId: map['id'] as int?,
     product: ProductEntity(
+      
       code: map['product_code'],
       name: map['product_name'],
       category: '', 
@@ -34,6 +38,7 @@ class CartItemModel extends CartItemEntity {
 
   Map<String, dynamic> toMap(int billId) {
     return {
+      
       'bill_id': billId,
       'product_code': product.code,
       'product_name': product.name,

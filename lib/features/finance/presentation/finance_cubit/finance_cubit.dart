@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:point_zero/features/finance/domain/entities/expense_entity.dart';
 import 'package:point_zero/features/finance/domain/useCases/add_expense_useCase.dart';
+import 'package:point_zero/features/finance/domain/useCases/delete_expense_use_case.dart';
 import 'package:point_zero/features/finance/domain/useCases/get_monthly_expense_data.dart';
 import 'package:point_zero/features/finance/domain/useCases/get_monthly_sales_data.dart';
+import 'package:point_zero/features/finance/domain/useCases/update_expense_use_case.dart';
 
 import 'finance_state.dart';
 
@@ -10,11 +12,15 @@ class FinanceCubit extends Cubit<FinanceState> {
   final GetMonthlySalesDataUseCase getMonthlySalesUseCase;
   final GetMonthlyExpenseDataUseCase getMonthlyExpensesUseCase;
   final AddExpenseUseCase addExpenseUseCase;
+  final UpdateBillItemUseCase updateBillItemUseCase;
+  final DeleteBillItemUseCase deleteBillItemUseCase;
 
   FinanceCubit({
     required this.getMonthlySalesUseCase,
     required this.getMonthlyExpensesUseCase,
     required this.addExpenseUseCase,
+    required this.updateBillItemUseCase,
+    required this.deleteBillItemUseCase,
   }) : super(FinanceState.initial());
 
   // 1. دالة تحميل بيانات الشهر (مبيعات + مصروفات)
@@ -116,6 +122,54 @@ class FinanceCubit extends Cubit<FinanceState> {
       ),
       (_) async {
         await loadMonthlyData(month: state.currentMonth, year: state.currentYear);
+      },
+    );
+  }
+
+  Future<void> deleteSaleItem({
+    required int billItemId,
+    required int billId,
+  }) async {
+    final result = await deleteBillItemUseCase(
+      billItemId: billItemId,
+      billId: billId,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(status: FinanceStatus.error, error: failure.message),
+      ),
+      (_) async {
+        await loadMonthlyData(
+          month: state.currentMonth,
+          year: state.currentYear,
+        );
+      },
+    );
+  }
+
+  Future<void> updateSaleItem({
+    required int billItemId,
+    required int billId,
+    required int newQuantity,
+    required double newUnitPrice,
+  }) async {
+    final result = await updateBillItemUseCase(
+      billItemId: billItemId,
+      billId: billId,
+      newQuantity: newQuantity,
+      newUnitPrice: newUnitPrice,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(status: FinanceStatus.error, error: failure.message),
+      ),
+      (_) async {
+        await loadMonthlyData(
+          month: state.currentMonth,
+          year: state.currentYear,
+        );
       },
     );
   }

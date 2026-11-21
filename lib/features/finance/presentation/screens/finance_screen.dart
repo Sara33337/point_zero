@@ -84,10 +84,10 @@ class FinanceScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex: 3,
+                                flex: 4,
                                 child: SalesHistoryTable(bills: state.bills),
                               ),
-                              SizedBox(width: 6.w),
+                              SizedBox(width: 4.w),
                               Expanded(flex: 2, child: Column(
                                 children: [
                                   const AddExpenseForm(),

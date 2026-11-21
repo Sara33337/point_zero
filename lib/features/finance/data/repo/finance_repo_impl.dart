@@ -46,4 +46,29 @@ class FinanceRepositoryImpl implements FinanceRepository {
       return Left(LocalDatabaseFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> deleteBillItem({required int billItemId, required int billId}) async{
+    try {
+      await localDataSource.deleteBillItem(billItemId, billId);
+      return const Right(unit);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> updateBillItem({required int billItemId, required int billId, required int newQuantity, required double newUnitPrice})async {
+    try {
+      await localDataSource.updateBillItem(
+        billItemId,
+        billId,
+        newQuantity,
+        newUnitPrice,
+      );
+      return const Right(unit);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(e.toString()));
+    }
+  }
 }
