@@ -5,7 +5,7 @@ import 'package:point_zero/features/pos/data/models/bill_model.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
 
 abstract class PosLocalDataSource {
-  Future<void> checkout(BillModel bill);
+  Future<int> checkout(BillModel bill);
 }
 
 class PosLocalDataSourceImpl implements PosLocalDataSource {
@@ -14,16 +14,17 @@ class PosLocalDataSourceImpl implements PosLocalDataSource {
   PosLocalDataSourceImpl({required this.dbHelper});
 
   @override
-  Future<void> checkout(BillModel bill) async {
+  Future<int> checkout(BillModel bill) async {
     final db = await dbHelper.database;
+    int? createdBillId;
 
     try {
       await db.transaction((txn) async {
-        final int billId = await txn.insert('bills', bill.toMap());
+        createdBillId = await txn.insert('bills', bill.toMap());
         for (final item in bill.items) {
           final itemModel = CartItemModel.fromEntity(item);
 
-          await txn.insert('bill_items', itemModel.toMap(billId));
+          await txn.insert('bill_items', itemModel.toMap(createdBillId!));
 
           final int newStock = item.product.stockQuantity - item.quantity;
 
@@ -49,6 +50,14 @@ class PosLocalDataSourceImpl implements PosLocalDataSource {
         message: 'فشل في إتمام عملية الدفع وحفظ الفاتورة.',
       );
     }
+
+    if (createdBillId == null) {
+      throw LocalDatabaseException(
+        message: 'لم يتم الحصول على رقم الفاتورة بعد الحفظ.',
+      );
+    }
+
+    return createdBillId!;
   }
 
 }

@@ -23,30 +23,40 @@ class ReturnItem extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    state.returnedItem!.productName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  if (state.billId != null)
-
-                  Text(
-                    "${state.returnedItem!.productCode} | رقم الفاتورة : ${state.billId}",
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      state.returnedItem!.productName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (state.billId != null)
+                      Text(
+                        "${state.returnedItem!.productCode} | رقم الفاتورة: ${state.billId}",
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    TextButton.icon(
+                      onPressed: () =>
+                          context.read<ExchangeCubit>().clearReturnedItem(),
+                      icon: const Icon(Icons.edit, size: 16),
+                      label: const Text("تغيير المنتج"),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Text(
-                "\$${state.returnedItem!.unitPrice}",
+                "${state.returnedItem!.unitPrice} ج.م",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.orange,
                 ),
               ),
-              
-              // جمعنا زراير الكمية في Row عشان الشكل ميبقاش منعكش
               Row(
                 children: [
                   IconButton(
@@ -55,30 +65,28 @@ class ReturnItem extends StatelessWidget {
                       color: Colors.orange,
                     ),
                     onPressed: () {
-                      final currentQty = state.returnQuantity;
                       context.read<ExchangeCubit>().updateReturnQuantity(
-                        currentQty - 1,
-                        state.maxReturnQuantity, // 2. بنبعت الحد الأقصى الثابت
+                        state.returnQuantity - 1,
+                        state.maxReturnQuantity,
                       );
                     },
                   ),
-                  
-                  // 3. كبرنا الخط عشان الكاشير يشوفه بوضوح
                   Text(
                     '${state.returnQuantity}',
-                    style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  
                   IconButton(
                     icon: const Icon(
                       Icons.add_circle_outline,
                       color: Colors.orange,
                     ),
                     onPressed: () {
-                      final currentQty = state.returnQuantity;
                       context.read<ExchangeCubit>().updateReturnQuantity(
-                        currentQty + 1,
-                        state.maxReturnQuantity, // 2. بنبعت الحد الأقصى الثابت
+                        state.returnQuantity + 1,
+                        state.maxReturnQuantity,
                       );
                     },
                   ),

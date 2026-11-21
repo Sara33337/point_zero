@@ -33,7 +33,10 @@ class ReplacementSection extends StatelessWidget {
 
             // 2. قسم عرض نتائج البحث
             if (state.isSearchingReplacement)
-              const Expanded(flex: 3, child: Center(child: CircularProgressIndicator()))
+              const Expanded(
+                flex: 3,
+                child: Center(child: CircularProgressIndicator()),
+              )
             else if (state.replacementSearchResults.isNotEmpty)
               Expanded(
                 flex: 3,
@@ -49,14 +52,14 @@ class ReplacementSection extends StatelessWidget {
                       itemCount: state.replacementSearchResults.length,
                       itemBuilder: (context, index) {
                         final product = state.replacementSearchResults[index];
-                        
+
                         return ListTile(
                           shape: Border(
                             bottom: BorderSide(color: Colors.grey.shade200),
                           ),
                           // 👈 التعديل هنا: product.name مباشرة مش product.product.name
                           title: Text(
-                            product.name, 
+                            product.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
@@ -66,13 +69,15 @@ class ReplacementSection extends StatelessWidget {
                           trailing: Text(
                             "${product.sellingPrice} ج.م",
                             style: const TextStyle(
-                              color: Colors.green, 
+                              color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           onTap: () {
                             // 👈 التعديل هنا: الدالة المسؤولة عن إضافة المنتج للسلة
-                            context.read<ExchangeCubit>().addReplacementItem(product);
+                            context.read<ExchangeCubit>().addReplacementItem(
+                              product,
+                            );
                           },
                         );
                       },
@@ -96,7 +101,9 @@ class ReplacementSection extends StatelessWidget {
             // 3. قسم السلة البديلة (المنتجات المختارة)
             Text(
               "السلة البديلة (المنتجات المُختارة):",
-              style: AppStyles.mediumFont.copyWith(color: AppColors.primaryColor),
+              style: AppStyles.mediumFont.copyWith(
+                color: AppColors.primaryColor,
+              ),
             ),
             SizedBox(height: 8.h),
 
@@ -118,7 +125,7 @@ class ReplacementSection extends StatelessWidget {
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: ListView.builder(
-                          padding: EdgeInsets.zero, 
+                          padding: EdgeInsets.zero,
                           itemCount: state.replacementItems.length,
                           itemBuilder: (context, index) {
                             final item = state.replacementItems[index];
@@ -127,6 +134,21 @@ class ReplacementSection extends StatelessWidget {
                               onDelete: () => context
                                   .read<ExchangeCubit>()
                                   .removeReplacementItem(item),
+                              onIncrement: () => context
+                                  .read<ExchangeCubit>()
+                                  .updateReplacementQuantity(
+                                    item,
+                                    item.quantity + 1,
+                                  ),
+                              onDecrement: () => context
+                                  .read<ExchangeCubit>()
+                                  .updateReplacementQuantity(
+                                    item,
+                                    item.quantity - 1,
+                                  ),
+                                  onPriceChanged: (newPrice) => context
+      .read<ExchangeCubit>()
+      .updateReplacementPrice(item, newPrice),
                             );
                           },
                         ),

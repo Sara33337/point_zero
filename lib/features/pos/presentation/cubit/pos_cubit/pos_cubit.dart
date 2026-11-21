@@ -48,48 +48,55 @@ class PosCubit extends Cubit<PosState> {
   }
 
   // 3. إضافة منتج للسلة (أو تزويد كميته لو موجود)
-  void addToCart(ProductEntity product) {
+ void addToCart(ProductEntity product) {
     final List<CartItemEntity> updatedCart = List.from(state.cartItems);
 
-    // هل المنتج ده موجود في السلة أصلاً؟
     final existingIndex = updatedCart.indexWhere(
       (item) => item.product.id == product.id,
     );
 
     if (existingIndex >= 0) {
-      // موجود -> نزود الكمية
       final existingItem = updatedCart[existingIndex];
       if (existingItem.quantity < product.stockQuantity) {
         updatedCart[existingIndex] = existingItem.copyWith(
           quantity: existingItem.quantity + 1,
         );
       } else {
-        // لو الكمية المطلوبة أكبر من المخزن، ممكن نطلع Error state مؤقت
         emit(
           state.copyWith(
-            status: PosStatus.error,
-            error: 'الكمية غير متوفرة في المخزن',
+            status: PosStatus.loaded,
+            error: 'الكمية المتبقية في المخزن (${product.stockQuantity}) فقط',
           ),
         );
-        emit(
-          state.copyWith(status: PosStatus.loaded),
-        ); // نرجع للحالة العادية فوراً
         return;
       }
     } else {
-      // مش موجود -> نضيفه كعنصر جديد
       if (product.stockQuantity > 0) {
         updatedCart.add(
           CartItemEntity(
             product: product,
             quantity: 1,
-            unitPrice: product.sellingPrice, // السعر الافتراضي
+            unitPrice: product.sellingPrice,
           ),
         );
+      } else {
+        emit(
+          state.copyWith(
+            status: PosStatus.loaded,
+            error: 'المنتج "${product.name}" خلص من المخزون',
+          ),
+        );
+        return;
       }
     }
 
-    emit(state.copyWith(cartItems: updatedCart, status: PosStatus.loaded));
+    emit(
+      state.copyWith(
+        cartItems: updatedCart,
+        status: PosStatus.loaded,
+        error: '',
+      ),
+    );
   }
 
   // 4. تقليل الكمية أو حذف المنتج من السلة
@@ -133,32 +140,34 @@ class PosCubit extends Cubit<PosState> {
     emit(state.copyWith(cartItems: const [], status: PosStatus.loaded));
   }
 
-  // 7. إتمام الدفع (Checkout)
-  Future<void> checkout() async {
-    if (state.cartItems.isEmpty) return;
+  /// 7. إتمام الدفع (Checkout) - ترجع رقم الفاتورة الحقيقي أو -1 عند الفشل
+  Future<int> checkout() async {
+    if (state.cartItems.isEmpty) return -1;
     emit(state.copyWith(status: PosStatus.loading));
 
-    final bill = BillEntity(
-      items: state.cartItems,
+    final billToSave = BillEntity(
+      items: List.from(state.cartItems),
       totalAmount: state.totalAmount,
       createdAt: DateTime.now(),
       isExchange: false,
     );
 
-    final result = await checkoutUseCase(bill);
+    final result = await checkoutUseCase(billToSave);
 
-    result.fold(
-      (failure) =>
-          emit(state.copyWith(status: PosStatus.error, error: failure.message)),
-      (_) {
-        // نجاح الفاتورة -> نفضي السلة ونحدث بضاعة المخزن
+    return result.fold(
+      (failure) {
+        emit(state.copyWith(status: PosStatus.error, error: failure.message));
+        return -1;
+      },
+      (createdBillId) async {
         emit(
           state.copyWith(
             status: PosStatus.checkoutSuccess,
             cartItems: const [],
           ),
         );
-        loadProducts();
+        await loadProducts();
+        return createdBillId;
       },
     );
   }

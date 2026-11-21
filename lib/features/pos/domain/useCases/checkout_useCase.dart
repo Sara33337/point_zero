@@ -8,7 +8,7 @@ class CheckoutUseCase {
 
   CheckoutUseCase(this.repository);
 
-  Future<Either<Failure, Unit>> call(BillEntity bill) async {
+  Future<Either<Failure, int>> call(BillEntity bill) async {
     if (bill.items.isEmpty) {
       return Left(ValidationFailure('لا يمكن إتمام عملية بيع وفاتورة المشتريات فارغة.'));
     }

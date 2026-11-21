@@ -23,11 +23,7 @@ class BillBody extends StatelessWidget {
             padding: EdgeInsets.all(20.r),
             child: Column(
               children: [
-              
-                    Text(
-                       "الفاتورة الحالية",
-                      style: AppStyles.largeTitle,
-                    ),
+                Text("الفاتورة الحالية", style: AppStyles.largeTitle),
                 SizedBox(height: 16.h),
 
                 Expanded(
@@ -81,8 +77,6 @@ class BillBody extends StatelessWidget {
 
                 SizedBox(height: 16.h),
 
-                
-
                 PrimaryButton(
                   buttonText: "دفع",
                   onTap: () async {
@@ -96,7 +90,6 @@ class BillBody extends StatelessWidget {
                     }
 
                     for (var item in state.cartItems) {
-                 
                       if (item.unitPrice < item.product.wholesalePrice) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -110,23 +103,57 @@ class BillBody extends StatelessWidget {
                       }
                     }
 
-                    final currentBill = BillEntity(
-                      id: DateTime.now().millisecondsSinceEpoch,
-                      items: List.from(state.cartItems),
-                      totalAmount: state.totalAmount,
-                      createdAt: DateTime.now(),
+                    // ناخد نسخة من السلة والإجمالي قبل ما checkout() تفرّغ السلة
+                    final itemsSnapshot = List.from(
+                      state.cartItems,
+                    ).cast<dynamic>().toList();
+                    final totalSnapshot = state.totalAmount;
+                    final now = DateTime.now();
+
+                    final createdBillId = await context
+                        .read<PosCubit>()
+                        .checkout();
+                    if (!context.mounted) return;
+
+                    if (createdBillId <= 0) {
+                      final errorMsg = context.read<PosCubit>().state.error;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(errorMsg ?? "فشل في إتمام عملية الدفع"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    final savedBill = BillEntity(
+                      id: createdBillId,
+                      items: List.from(itemsSnapshot),
+                      totalAmount: totalSnapshot,
+                      createdAt: now,
                       isExchange: false,
                     );
 
-                    context.read<PosCubit>().checkout();
-                    await InvoicePrinter.printReceipt(currentBill);
+                    try {
+                      await InvoicePrinter.printReceipt(savedBill);
+                    } catch (_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "تم حفظ الفاتورة بنجاح، ولكن تعذرت الطباعة.",
+                          ),
+                        ),
+                      );
+                    }
                   },
                 ),
-                
-                SizedBox(height: 6.h,),
-                SecondaryButton(buttonText: 
-                "استبدال", onTap: () => showExchangeDialog(context))
 
+                SizedBox(height: 6.h),
+                SecondaryButton(
+                  buttonText: "استبدال",
+                  onTap: () => showExchangeDialog(context),
+                ),
               ],
             ),
           ),

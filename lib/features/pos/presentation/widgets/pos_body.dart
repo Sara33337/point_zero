@@ -86,7 +86,20 @@ class _PosBodyState extends State<PosBody> {
             ),
             SizedBox(height: 16.h),
 
-            BlocBuilder<PosCubit, PosState>(
+            BlocConsumer<PosCubit, PosState>(
+              listener: (context, state) {
+                if (state.error.isNotEmpty) {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(state.error),
+                        backgroundColor: Colors.red,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                }
+              },
               builder: (context, state) {
                 if (state.status == PosStatus.loading) {
                   return const Expanded(
@@ -94,7 +107,8 @@ class _PosBodyState extends State<PosBody> {
                   );
                 }
 
-                if (state.status == PosStatus.error) {
+                if (state.status == PosStatus.error &&
+                    state.allProducts.isEmpty) {
                   return Expanded(
                     child: Center(
                       child: Text(
@@ -105,7 +119,8 @@ class _PosBodyState extends State<PosBody> {
                   );
                 }
 
-                if (state.status == PosStatus.loaded || state.status == PosStatus.checkoutSuccess) {
+                if (state.status == PosStatus.loaded ||
+                    state.status == PosStatus.checkoutSuccess) {
                   if (state.filteredProducts.isEmpty) {
                     return const Expanded(
                       child: Center(
@@ -127,7 +142,8 @@ class _PosBodyState extends State<PosBody> {
                         final product = state.filteredProducts[index];
                         return ProductForCashier(
                           product: product,
-                          onTap: () => context.read<PosCubit>().addToCart(product),
+                          onTap: () =>
+                              context.read<PosCubit>().addToCart(product),
                         );
                       },
                     ),

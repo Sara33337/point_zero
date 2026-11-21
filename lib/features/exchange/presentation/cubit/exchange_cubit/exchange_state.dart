@@ -1,15 +1,13 @@
 import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart';
 import 'package:point_zero/features/inventory/domain/entites/product_entity.dart';
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
-import 'package:point_zero/features/pos/domain/entities/bill_entity.dart';
-
 
 enum ExchangeStatus { initial, loading, success, error }
 
 class ExchangeState {
   final ExchangeStatus status;
   final String? errorMessage;
-  
+
   // returned item
   final PastSaleItemEntity? returnedItem;
   final bool isSearching;
@@ -21,7 +19,6 @@ class ExchangeState {
   // total blocks
   final double returnCredit;
   final double customerPays;
-
 
   // replacement item
   final List<CartItemModel> replacementItems;
@@ -49,8 +46,9 @@ class ExchangeState {
   ExchangeState copyWith({
     ExchangeStatus? status,
     String? errorMessage,
+    bool clearError = false,
     PastSaleItemEntity? returnedItem,
-    BillEntity? bill,
+    bool clearReturnedItem = false,
     int? billId,
     int? returnQuantity,
     int? maxReturnQuantity,
@@ -65,11 +63,15 @@ class ExchangeState {
   }) {
     return ExchangeState(
       status: status ?? this.status,
-      errorMessage: errorMessage ?? this.errorMessage,
-      returnedItem: returnedItem ?? this.returnedItem,
-      billId: billId ?? this.billId,
-      returnQuantity: returnQuantity ?? this.returnQuantity,
-      maxReturnQuantity: maxReturnQuantity ?? this.maxReturnQuantity,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      returnedItem:
+          clearReturnedItem ? null : (returnedItem ?? this.returnedItem),
+      billId: clearReturnedItem ? null : (billId ?? this.billId),
+      returnQuantity:
+          clearReturnedItem ? 1 : (returnQuantity ?? this.returnQuantity),
+      maxReturnQuantity: clearReturnedItem
+          ? 1
+          : (maxReturnQuantity ?? this.maxReturnQuantity),
       replacementItems: replacementItems ?? this.replacementItems,
       returnCredit: returnCredit ?? this.returnCredit,
       replacementTotal: replacementTotal ?? this.replacementTotal,

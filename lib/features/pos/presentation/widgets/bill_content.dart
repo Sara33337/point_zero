@@ -9,7 +9,6 @@ import 'package:point_zero/features/exchange/domain/entities/past_sale_item.dart
 import 'package:point_zero/features/pos/data/models/cart_item_model.dart';
 import 'package:point_zero/features/pos/domain/entities/bill_entity.dart';
 
-
 class BillContent extends StatelessWidget {
   final List<BillEntity> bills;
 
@@ -42,24 +41,31 @@ class BillContent extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("فاتورة #${bill.id}", style: AppStyles.largeTitle),
+                  Text("فاتورة #${bill.id}", style: AppStyles.mediumFont),
                   Text(formattedDate, style: AppStyles.smallTitle),
                   Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                        decoration: BoxDecoration(
-                          // لو استبدال لونها برتقالي، لو بيع لونها أخضر
-                          color: bill.isExchange ? Colors.orange.shade100 : Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        child: Text(
-                          bill.isExchange ? "استبدال" : "بيع",
-                          style: TextStyle(
-                            color: bill.isExchange ? Colors.orange.shade800 : Colors.green.shade800,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      // لو استبدال لونها برتقالي، لو بيع لونها أخضر
+                      color: bill.isExchange
+                          ? Colors.orange.shade100
+                          : Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                    child: Text(
+                      bill.isExchange ? "استبدال" : "بيع",
+                      style: TextStyle(
+                        color: bill.isExchange
+                            ? Colors.orange.shade800
+                            : Colors.green.shade800,
+                        fontSize: 6.sp,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ),
                 ],
               ),
 
@@ -72,18 +78,23 @@ class BillContent extends StatelessWidget {
                     children: [
                       Text(
                         cartItem.product.name,
-                        style: AppStyles.mediumFont.copyWith(
+                        style: AppStyles.smallTitle.copyWith(
                           overflow: TextOverflow.ellipsis,
-                        ),
+                         ),
                       ),
                       Text(
                         cartItem.unitPrice.toString(),
-                        style: AppStyles.mediumFont,
+                        style: AppStyles.smallTitle
                       ),
-                      Text(cartItem.product.code, style: AppStyles.mediumFont),
+                      Text(
+                        cartItem.product.code,
+                        style: AppStyles.smallTitle
+                      ),
                       Text(
                         'الكمية: ${cartItem.quantity}',
-                        style: AppStyles.mediumFont,
+                        style: AppStyles.smallTitle.copyWith(
+                          color: AppColors.secondaryColor,
+                        ),
                       ),
                     ],
                   ),
@@ -96,8 +107,9 @@ class BillContent extends StatelessWidget {
                 children: [
                   Text(
                     "الإجمالي: ${bill.totalAmount} جنيه",
-                    style: AppStyles.largeTitle.copyWith(
+                    style: AppStyles.mediumFont.copyWith(
                       color: AppColors.secondaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
@@ -106,11 +118,13 @@ class BillContent extends StatelessWidget {
                     child: PrimaryButton(
                       buttonText: "طباعة",
                       onTap: () async {
-                        if (bill.isExchange && bill.returnedProductName != null) {
+                        if (bill.isExchange &&
+                            bill.returnedProductName != null) {
                           // 1. حساب إجمالي البدائل
                           double replacementTotal = 0;
                           for (var item in bill.items) {
-                            replacementTotal += (item.unitPrice * item.quantity);
+                            replacementTotal +=
+                                (item.unitPrice * item.quantity);
                           }
 
                           // 2. عمل كائن وهمي للمرتجع عشان نبعته لدالة الطباعة بتاعتك
@@ -127,7 +141,9 @@ class BillContent extends StatelessWidget {
                           await InvoicePrinter.printExchangeReceipt(
                             returnedItem: dummyReturnedItem,
                             returnQuantity: bill.returnedQuantity!,
-                            replacementItems: bill.items.map((e) => e as CartItemModel).toList(),
+                            replacementItems: bill.items
+                                .map((e) => e as CartItemModel)
+                                .toList(),
                             returnCredit: bill.returnCredit!,
                             replacementTotal: replacementTotal,
                             differencePaid: bill.totalAmount,

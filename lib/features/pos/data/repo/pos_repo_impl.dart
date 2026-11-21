@@ -12,13 +12,14 @@ class PosRepositoryImpl implements PosRepository {
   PosRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<Failure, Unit>> checkout(BillEntity bill) async {
+  Future<Either<Failure, int>> checkout(BillEntity bill) async {
     try {
-      final result = BillModel.fromEntity(bill);
+     final result = BillModel.fromEntity(bill);
 
-      await localDataSource.checkout(result);
 
-      return const Right(unit);
+      final createdBillId = await localDataSource.checkout(result);
+
+      return Right(createdBillId);
     } on LocalDatabaseException catch (e) {
       return Left(LocalDatabaseFailure(e.message));
     } catch (e) {

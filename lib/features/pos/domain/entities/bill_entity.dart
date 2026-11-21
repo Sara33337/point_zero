@@ -23,6 +23,32 @@ class BillEntity extends Equatable {
     this.returnCredit,
     this.returnedWholesaleCost,
   });
+
+  BillEntity copyWith({
+    int? id,
+    List<CartItemEntity>? items,
+    double? totalAmount,
+    DateTime? createdAt,
+    bool? isExchange,
+    String? returnedProductName,
+    int? returnedQuantity,
+    double? returnCredit,
+    double? returnedWholesaleCost,
+  }) {
+    return BillEntity(
+      id: id ?? this.id,
+      items: items ?? this.items,
+      totalAmount: totalAmount ?? this.totalAmount,
+      createdAt: createdAt ?? this.createdAt,
+      isExchange: isExchange ?? this.isExchange,
+      returnedProductName: returnedProductName ?? this.returnedProductName,
+      returnedQuantity: returnedQuantity ?? this.returnedQuantity,
+      returnCredit: returnCredit ?? this.returnCredit,
+      returnedWholesaleCost:
+          returnedWholesaleCost ?? this.returnedWholesaleCost,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,

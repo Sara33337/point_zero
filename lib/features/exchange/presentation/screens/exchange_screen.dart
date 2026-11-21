@@ -25,21 +25,40 @@ class ExchangeDialogWidget extends StatelessWidget {
           child: BlocConsumer<ExchangeCubit, ExchangeState>(
             listener: (context, state) async {
               if (state.status == ExchangeStatus.success) {
-                await InvoicePrinter.printExchangeReceipt(
-                  returnedItem: state.returnedItem!,
-                  returnQuantity: state.returnQuantity,
-                  replacementItems: state.replacementItems,
-                  returnCredit: state.returnCredit,
-                  replacementTotal: state.replacementTotal,
-                  differencePaid: state.customerPays,
-                );
-                Navigator.pop(context); 
+                bool printFailed = false;
+                try {
+                  await InvoicePrinter.printExchangeReceipt(
+                    returnedItem: state.returnedItem!,
+                    returnQuantity: state.returnQuantity,
+                    replacementItems: state.replacementItems,
+                    returnCredit: state.returnCredit,
+                    replacementTotal: state.replacementTotal,
+                    differencePaid: state.customerPays,
+              
+                  );
+                } catch (_) {
+                  printFailed = true;
+                }
+
+                if (!context.mounted) return;
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم الاستبدال بنجاح!')),
+                  SnackBar(
+                    content: Text(
+                      printFailed
+                          ? 'تم الاستبدال بنجاح، ولكن تعذرت طباعة الإيصال.'
+                          : 'تم الاستبدال بنجاح!',
+                    ),
+                  ),
                 );
-              } else if (state.status == ExchangeStatus.error) {
+              } else if (state.status == ExchangeStatus.error &&
+                  state.errorMessage != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.errorMessage ?? 'حدث خطأ')),
+                  SnackBar(content: Text(state.errorMessage!)),
+                );
+              } else if (state.errorMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.errorMessage!)),
                 );
               }
             },
@@ -47,7 +66,6 @@ class ExchangeDialogWidget extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- الهيدر (Header) ---
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -57,42 +75,37 @@ class ExchangeDialogWidget extends StatelessWidget {
                           SizedBox(width: 8.w),
                           Text(
                             "استبدال منتج",
-                            style: AppStyles.largeTitle.copyWith(
-                              fontSize: 6.sp,
-                            ),
+                            style: AppStyles.largeTitle.copyWith(fontSize: 8.sp),
                           ),
                         ],
                       ),
                       IconButton(
                         icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: state.status == ExchangeStatus.loading
+                            ? null
+                            : () => Navigator.pop(context),
                       ),
                     ],
                   ),
                   Text(
-                    "ابحث عن الفاتورة القديمة، ثم اختر المنتجات البديلة. لا يوجد استرجاع نقدي لفرق السعر.",
+                    "ابحث عن الفاتورة القديمة أو كود المنتج، ثم اختر المنتجات البديلة. لا يوجد استرجاع نقدي لفرق السعر.",
                     style: AppStyles.smallTitle,
                   ),
                   SizedBox(height: 24.h),
-
                   Expanded(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(child: ReturnItemsSection()),
-
-                        SizedBox(width: 20.w), // مسافة بين العمودين
-
-                        Expanded(child: ReplacementSection()),
+                        const Expanded(child: ReturnItemsSection()),
+                        SizedBox(width: 20.w),
+                        const Expanded(child: ReplacementSection()),
                       ],
                     ),
                   ),
-
                   SizedBox(height: 10.h),
                   Divider(color: Colors.grey.shade300),
                   SizedBox(height: 6.h),
-
-                  ExchangeBottomBar(),
+                  const ExchangeBottomBar(),
                 ],
               );
             },
