@@ -10,7 +10,7 @@ abstract class ExchangeRepository{
   Future<Either<Failure, List<ProductEntity>>> searchProducts(String query);
 
   
-  Future<Either<Failure, Unit>> processExchangeTransaction({
+  Future<Either<Failure, int>> processExchangeTransaction({
     required PastSaleItemEntity returnedItem,
     required List<CartItemModel> replacementItems,
     required double differencePaid,

@@ -13,6 +13,7 @@ class ExchangeState {
   final bool isSearching;
   final List<PastSaleItemEntity> searchResults;
   final int? billId;
+  final int? newBillId;
   final int returnQuantity;
   final int maxReturnQuantity;
 
@@ -31,6 +32,7 @@ class ExchangeState {
     this.errorMessage,
     this.returnedItem,
     this.billId,
+    this.newBillId,
     this.returnQuantity = 1,
     this.maxReturnQuantity = 1,
     this.replacementItems = const [],
@@ -50,6 +52,7 @@ class ExchangeState {
     PastSaleItemEntity? returnedItem,
     bool clearReturnedItem = false,
     int? billId,
+    int? newBillId,
     int? returnQuantity,
     int? maxReturnQuantity,
     List<CartItemModel>? replacementItems,
@@ -67,6 +70,7 @@ class ExchangeState {
       returnedItem:
           clearReturnedItem ? null : (returnedItem ?? this.returnedItem),
       billId: clearReturnedItem ? null : (billId ?? this.billId),
+      newBillId: newBillId ?? this.newBillId,
       returnQuantity:
           clearReturnedItem ? 1 : (returnQuantity ?? this.returnQuantity),
       maxReturnQuantity: clearReturnedItem

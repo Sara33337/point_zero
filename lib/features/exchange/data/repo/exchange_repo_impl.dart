@@ -29,18 +29,19 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> processExchangeTransaction({
+  Future<Either<Failure, int>> processExchangeTransaction({
     required PastSaleItemEntity returnedItem,
     required List<CartItemModel> replacementItems,
     required double differencePaid,
   }) async {
     try {
-      await localDataSource.processExchangeTransaction(
-        returnedItem: returnedItem,
-        replacementItems: replacementItems,
-        differencePaid: differencePaid,
-      );
-      return const Right(unit);
+      final newBillId = await localDataSource.processExchangeTransaction(
+  returnedItem: returnedItem,
+  replacementItems: replacementItems,
+  differencePaid: differencePaid,
+);
+return Right(newBillId);
+
     } on LocalDatabaseException catch (e) {
       return Left(LocalDatabaseFailure(e.message));
     } catch (e) {

@@ -139,6 +139,7 @@ class BillContent extends StatelessWidget {
 
                           // 3. طباعة إيصال الاستبدال كاملاً
                           await InvoicePrinter.printExchangeReceipt(
+                            exchangeBillId: bill.id!,
                             returnedItem: dummyReturnedItem,
                             returnQuantity: bill.returnedQuantity!,
                             replacementItems: bill.items

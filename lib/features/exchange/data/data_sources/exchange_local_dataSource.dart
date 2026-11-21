@@ -9,7 +9,7 @@ abstract class ExchangeLocalDatasource {
   Future<List<PastSaleItemModel>> searchPastSales(String query);
   Future<List<ProductModel>> searchProducts(String query);
 
-  Future<void> processExchangeTransaction({
+  Future<int> processExchangeTransaction({
     required PastSaleItemEntity returnedItem,
     required List<CartItemModel> replacementItems,
     required double differencePaid,
@@ -48,13 +48,15 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
 
     return results.map((map) => PastSaleItemModel.fromMap(map)).toList();
   }
+
   @override
-  Future<void> processExchangeTransaction({
+  Future<int> processExchangeTransaction({
     required PastSaleItemEntity returnedItem,
     required List<CartItemModel> replacementItems,
     required double differencePaid,
   }) async {
     final db = await dbHelper.database;
+    int? createdNewBillId;
 
     await db.transaction((txn) async {
       // 1. التحقق من سطر المنتج في الفاتورة القديمة وخصم الكمية المرتجعة
@@ -63,6 +65,8 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
         where: 'bill_id = ? AND product_code = ?',
         whereArgs: [returnedItem.billId, returnedItem.productCode],
       );
+
+      
 
       if (billItemRows.isEmpty) {
         throw LocalDatabaseException();
@@ -139,11 +143,12 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
       }
 
       // 4. إنشاء فاتورة الاستبدال الجديدة
-      final int newBillId = await txn.insert('bills', {
+     final int newBillId = await txn.insert('bills', {
         'total_amount': differencePaid,
         'created_at': DateTime.now().toIso8601String(),
         'is_exchange': 1,
       });
+      createdNewBillId = newBillId;
 
       // 5. إضافة المنتجات البديلة للفاتورة الجديدة
       for (final item in replacementItems) {
@@ -170,6 +175,8 @@ class ExchangeLocalDatasourceImpl implements ExchangeLocalDatasource {
         'created_at': DateTime.now().toIso8601String(),
       });
     });
+
+    return createdNewBillId!;
   }
 
   @override

@@ -285,10 +285,11 @@ class ExchangeCubit extends Cubit<ExchangeState> {
           ),
         );
       },
-      (_) {
+      (createdNewBillId) {
         emit(
           state.copyWith(
             status: ExchangeStatus.success,
+            newBillId: createdNewBillId,
             clearError: true,
           ),
         );

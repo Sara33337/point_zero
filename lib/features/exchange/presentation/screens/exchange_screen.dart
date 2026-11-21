@@ -28,6 +28,7 @@ class ExchangeDialogWidget extends StatelessWidget {
                 bool printFailed = false;
                 try {
                   await InvoicePrinter.printExchangeReceipt(
+                    exchangeBillId: state.newBillId!,
                     returnedItem: state.returnedItem!,
                     returnQuantity: state.returnQuantity,
                     replacementItems: state.replacementItems,

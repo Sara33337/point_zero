@@ -54,7 +54,7 @@ class InvoicePrinter {
   static Future<void> printExchangeReceipt({
     required PastSaleItemEntity returnedItem,
     required int returnQuantity,
-   
+   required int exchangeBillId,
     required List<CartItemEntity> replacementItems, // 👈 التعديل هنا: Entity
     required double returnCredit,
     required double replacementTotal,
@@ -75,6 +75,7 @@ class InvoicePrinter {
                 title: 'إيصال استبدال',
                 date: formattedDate,
                 fonts: fonts,
+                billId: exchangeBillId.toString(),
               ),
             ),
             // pw.Text(

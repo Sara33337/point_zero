@@ -22,7 +22,7 @@ class ProcessExchangeUseCase {
 
   ProcessExchangeUseCase(this.repository);
 
-  Future<Either<Failure, Unit>> call(ProcessExchangeParams params) async {
+  Future<Either<Failure, int>> call(ProcessExchangeParams params) async {
     return await repository.processExchangeTransaction(
       returnedItem: params.returnedItem,
       replacementItems: params.replacementItems,
