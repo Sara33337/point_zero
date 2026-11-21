@@ -32,7 +32,9 @@ class InvoicePrinter {
               title: 'فاتورة مبيعات',
               date: formattedDate,
               fonts: fonts,
+              billId: bill.id.toString(), 
             ),
+          
             // 👈 التعديل هنا: بعتنا المنتجات مباشرة بدون تحويل
             _buildProductsTable(bill.items, fonts),
             _buildTotalsRow(
@@ -52,6 +54,7 @@ class InvoicePrinter {
   static Future<void> printExchangeReceipt({
     required PastSaleItemEntity returnedItem,
     required int returnQuantity,
+   
     required List<CartItemEntity> replacementItems, // 👈 التعديل هنا: Entity
     required double returnCredit,
     required double replacementTotal,
@@ -74,6 +77,14 @@ class InvoicePrinter {
                 fonts: fonts,
               ),
             ),
+            // pw.Text(
+            //   'رقم الفاتورة الأصلية: #${returnedItem.billId}',
+            //   style: pw.TextStyle(
+            //     font: fonts['bold'],
+            //     fontSize: 8,
+            //     fontWeight: pw.FontWeight.bold,
+            //   ),
+            // ),
             _buildSectionTitle('المنتجات المُسترجعة:', fonts),
             _buildItemRow(
               '${returnedItem.productName} (x$returnQuantity)',
@@ -156,7 +167,7 @@ class InvoicePrinter {
                     productName,
                     style: pw.TextStyle(
                       font: arabicFont,
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: pw.FontWeight.bold,
                     ),
                     maxLines: 1,
@@ -206,6 +217,7 @@ class InvoicePrinter {
     required String title,
     required String date,
     required Map<String, pw.Font> fonts,
+    String? billId, 
   }) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -227,6 +239,14 @@ class InvoicePrinter {
           'التاريخ: $date',
           style: pw.TextStyle(fontSize: 10, font: fonts['regular']),
         ),
+          pw.Text(
+              'رقم الفاتورة : #$billId',
+              style: pw.TextStyle(
+                font: fonts['bold'],
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
         pw.SizedBox(height: 10),
         pw.Divider(borderStyle: pw.BorderStyle.dashed),
       ],
